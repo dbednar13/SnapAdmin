@@ -1,0 +1,17 @@
+{
+  "name": "snapadmin",
+  "version": "1.0.0",
+  "description": "Web based UI for SnapRaid",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --parallel --stream -r dev",
+    "build": "pnpm -r build",
+    "backend:dev": "pnpm --filter backend dev",
+    "webapp:dev": "pnpm --filter webapp dev",
+    "backend:build": "pnpm --filter backend build",
+    "webapp:build": "pnpm --filter webapp build"
+  },
+  "keywords": ["snapraid", "monorepo", "pnpm"],
+  "author": "",
+  "license": "GPL-3.0"
+}
