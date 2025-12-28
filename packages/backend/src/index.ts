@@ -18,6 +18,11 @@ app.get('/api/health', (req: Request, res: Response) => {
 });
 
 // Start server
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`🚀 Backend server running on http://localhost:${PORT}`);
+});
+
+server.on('error', (err) => {
+  console.error(`❌ Failed to start backend server on port ${PORT}:`, err);
+  process.exit(1);
 });
