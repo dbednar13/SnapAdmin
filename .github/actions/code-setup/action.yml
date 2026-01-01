@@ -1,0 +1,19 @@
+name: 'Code Setup'
+description: 'Re-usable action to checkout code'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Enable Corepack
+      run: corepack enable
+      shell: bash
+
+    - name: Setup Node.js (with pnpm cache)
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22
+        cache: 'pnpm'
+
+    - name: Install dependencies
+      run: pnpm install --frozen-lockfile
+      shell: bash
