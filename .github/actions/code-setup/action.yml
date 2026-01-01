@@ -1,12 +1,9 @@
-name: 'Code Checkout'
+name: 'Code Setup'
 description: 'Re-usable action to checkout code'
 
 runs:
   using: 'composite'
   steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-
     - name: Enable Corepack
       run: corepack enable
 

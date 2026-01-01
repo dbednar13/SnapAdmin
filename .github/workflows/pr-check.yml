@@ -11,8 +11,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Code Checkout
-        uses: ./.github/actions/code-checkout
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Code Setup
+        uses: ./.github/actions/code-setup
 
   Prettier-Check:
     name: Prettier Check
@@ -20,8 +22,8 @@ jobs:
     needs: Check-Out
 
     steps:
-      - name: Code Checkout
-        uses: ./.github/actions/code-checkout
+      - name: Code Setup
+        uses: ./.github/actions/code-setup
 
       - name: Prettier check - backend
         working-directory: packages/backend
@@ -37,8 +39,8 @@ jobs:
     needs: Check-Out
 
     steps:
-      - name: Code Checkout
-        uses: ./.github/actions/code-checkout
+      - name: Code Setup
+        uses: ./.github/actions/code-setup
 
       - name: ESLint check - backend
         working-directory: packages/backend
@@ -54,8 +56,8 @@ jobs:
     needs: Check-Out
 
     steps:
-      - name: Code Checkout
-        uses: ./.github/actions/code-checkout
+      - name: Code Setup
+        uses: ./.github/actions/code-setup
 
       - name: Build packages
         run: pnpm run build
