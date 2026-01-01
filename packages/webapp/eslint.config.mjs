@@ -19,11 +19,11 @@ export default defineConfig([
       prettierConfig,
     ],
     languageOptions: {
+      parserOptions: {
+        tsconfigRootDir: import.meta.dirname,
+      },
       ecmaVersion: 2020,
       globals: globals.browser,
-    },
-    parserOptions: {
-      tsconfigRootDir: import.meta.dirname,
     },
   },
 ]);

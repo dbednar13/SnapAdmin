@@ -8,8 +8,10 @@ export default defineConfig(
   eslint.configs.recommended,
   tseslint.configs.recommended,
   {
-    parserOptions: {
-      tsconfigRootDir: import.meta.dirname,
+    languageOptions: {
+      parserOptions: {
+        tsconfigRootDir: import.meta.dirname,
+      },
     },
   },
   prettierConfig
