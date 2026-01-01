@@ -7,7 +7,7 @@ on:
 
 jobs:
   Check-Out:
-    name: Lint, Prettier and Build
+    name: Checkout & Validate Setup
     runs-on: ubuntu-latest
 
     steps:
