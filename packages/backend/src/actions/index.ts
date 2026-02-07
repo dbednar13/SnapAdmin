@@ -22,11 +22,28 @@ function processArg(arg: string[]): string {
 }
 
 function toString(args: Record<string, string>): string {
-  let argsString = '';
+  const parts: string[] = [];
   Object.keys(args).forEach((key) => {
-    argsString += ` -${key} ${args[key]}`;
+    const rawValue = args[key];
+    const value = typeof rawValue === 'string' ? rawValue.trim() : String(rawValue ?? '').trim();
+
+    if (key.startsWith('-')) {
+      // Key is already a flag (e.g. "-c"), don't prefix another dash.
+      if (value) {
+        parts.push(key, value);
+      } else {
+        parts.push(key);
+      }
+    } else {
+      // Key is a subcommand or positional argument (e.g. "check").
+      if (value) {
+        parts.push(key, value);
+      } else {
+        parts.push(key);
+      }
+    }
   });
-  return argsString.trimEnd();
+  return parts.join(' ');
 }
 
 function finalizeArguments(defaultArgs: string[], userArgs: string[]): string {
