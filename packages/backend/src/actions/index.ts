@@ -1,0 +1,101 @@
+/*
+ * functions to manage SnapRaid actions like sync, scrub, etc.
+ */
+
+function splitArguments(arg: string): [string, string[]] {
+  const newArg = arg.split(' ');
+  const key = newArg[0];
+
+  return [key, newArg];
+}
+
+function processArg(arg: string[]): string {
+  // process a single command line argument for SnapRaid commands.
+  let value = '';
+
+  if (arg.length > 1) {
+    for (let i = 1; i < arg.length; i++) {
+      value += arg[i] + ' ';
+    }
+  }
+  return value.trim();
+}
+
+function toString(args: any): string {
+  let argsString = '';
+  Object.keys(args).forEach((key) => {
+    argsString += ` -${key} ${args[key]}`;
+  });
+  return argsString.trimEnd();
+}
+
+function finalizeArguments(defaultArgs: string[], userArgs: string[]): string {
+  // finalize command line arguments for SnapRaid commands.
+  let config: any = {};
+
+  for (const arg of defaultArgs) {
+    const [key, newArg] = splitArguments(arg);
+
+    const value = processArg(newArg);
+
+    config[key] = value;
+  }
+
+  for (const arg of userArgs) {
+    const [key, newArg] = splitArguments(arg);
+    const value = processArg(newArg);
+
+    config[key] = value;
+  }
+
+  return toString(config);
+}
+
+export function check(userArgs: string[]) {
+  const defaultArgs = ['check -c /etc/snapraid.conf'];
+  const args = finalizeArguments(defaultArgs, userArgs);
+}
+
+export function differences(userArgs: string[]) {
+  const defaultArgs = ['differences -c /etc/snapraid.conf'];
+  const args = finalizeArguments(defaultArgs, userArgs);
+}
+
+export function discoverMissing(userArgs: string[]) {
+  const defaultArgs = ['discovermissing -c /etc/snapraid.conf'];
+  const args = finalizeArguments(defaultArgs, userArgs);
+}
+
+export function duplicateFinder(userArgs: string[]) {
+  const defaultArgs = ['duplicatefinder -c /etc/snapraid.conf'];
+  const args = finalizeArguments(defaultArgs, userArgs);
+}
+
+export function fix(userArgs: string[]) {
+  const defaultArgs = ['fix -c /etc/snapraid.conf'];
+  const args = finalizeArguments(defaultArgs, userArgs);
+}
+
+export function forceFullSync(userArgs: string[]) {
+  const defaultArgs = ['sync -c /etc/snapraid.conf -f'];
+  const args = finalizeArguments(defaultArgs, userArgs);
+}
+
+export function scrub(userArgs: string[]) {
+  const defaultArgs = ['scrub -c /etc/snapraid.conf'];
+  const args = finalizeArguments(defaultArgs, userArgs);
+}
+
+export function status(userArgs: string[]) {
+  const defaultArgs = ['status -c /etc/snapraid.conf'];
+  const args = finalizeArguments(defaultArgs, userArgs);
+}
+
+export function sync(userArgs: string[]) {
+  const defaultArgs = ['sync -c /etc/snapraid.conf'];
+  const args = finalizeArguments(defaultArgs, userArgs);
+}
+
+export function test() {
+  // test function for development, doesn't call any actual snapraid.  Delete me.
+}

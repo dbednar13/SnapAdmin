@@ -1,5 +1,6 @@
 # SnapAdmin
-Web based UI for SnapRaid
+
+Web based UI for SnapRaid. Inspired and influenced heavily by [Elucidate](https://github.com/Smurf-IV/Elucidate). If you wish for an application to manage your SnapRaid installation I recommend checking them out.
 
 ## Project Structure
 
@@ -10,7 +11,7 @@ This is a PNPM monorepo containing two packages:
 
 ## Prerequisites
 
-- Node.js 18+ 
+- Node.js 18+
 - PNPM 8+
 
 ## Installation
@@ -60,6 +61,7 @@ pnpm webapp:build
 ## Package Details
 
 ### Backend (`packages/backend`)
+
 - Express server with TypeScript
 - Runs on http://localhost:3000
 - API endpoints:
@@ -67,6 +69,7 @@ pnpm webapp:build
   - `GET /api/health` - Health check
 
 ### Webapp (`packages/webapp`)
+
 - Vite + React + TypeScript
 - Runs on http://localhost:5173
 - Hot module replacement enabled
