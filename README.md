@@ -1,6 +1,6 @@
 # SnapAdmin
 
-Web based UI for SnapRaid. Inspired and influenced heavily by [Elucidate](https://github.com/Smurf-IV/Elucidate). If you wish for an application to manage your SnapRaid installation I recommend checking them out.
+Web based UI for SnapRaid. Inspired and influenced heavily by [Elucidate](https://github.com/Smurf-IV/Elucidate). If you wish for an application to manage your SnapRaid installation, I recommend checking it out.
 
 ## Project Structure
 
