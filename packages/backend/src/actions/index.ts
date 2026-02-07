@@ -21,7 +21,7 @@ function processArg(arg: string[]): string {
   return value.trim();
 }
 
-function toString(args: any): string {
+function toString(args: Record<string, string>): string {
   let argsString = '';
   Object.keys(args).forEach((key) => {
     argsString += ` -${key} ${args[key]}`;
@@ -31,7 +31,7 @@ function toString(args: any): string {
 
 function finalizeArguments(defaultArgs: string[], userArgs: string[]): string {
   // finalize command line arguments for SnapRaid commands.
-  let config: any = {};
+  const config: Record<string, string> = {};
 
   for (const arg of defaultArgs) {
     const [key, newArg] = splitArguments(arg);
@@ -54,46 +54,64 @@ function finalizeArguments(defaultArgs: string[], userArgs: string[]): string {
 export function check(userArgs: string[]) {
   const defaultArgs = ['check -c /etc/snapraid.conf'];
   const args = finalizeArguments(defaultArgs, userArgs);
+
+  console.log(args);
 }
 
 export function differences(userArgs: string[]) {
   const defaultArgs = ['differences -c /etc/snapraid.conf'];
   const args = finalizeArguments(defaultArgs, userArgs);
+
+  console.log(args);
 }
 
 export function discoverMissing(userArgs: string[]) {
   const defaultArgs = ['discovermissing -c /etc/snapraid.conf'];
   const args = finalizeArguments(defaultArgs, userArgs);
+
+  console.log(args);
 }
 
 export function duplicateFinder(userArgs: string[]) {
   const defaultArgs = ['duplicatefinder -c /etc/snapraid.conf'];
   const args = finalizeArguments(defaultArgs, userArgs);
+
+  console.log(args);
 }
 
 export function fix(userArgs: string[]) {
   const defaultArgs = ['fix -c /etc/snapraid.conf'];
   const args = finalizeArguments(defaultArgs, userArgs);
+
+  console.log(args);
 }
 
 export function forceFullSync(userArgs: string[]) {
   const defaultArgs = ['sync -c /etc/snapraid.conf -f'];
   const args = finalizeArguments(defaultArgs, userArgs);
+
+  console.log(args);
 }
 
 export function scrub(userArgs: string[]) {
   const defaultArgs = ['scrub -c /etc/snapraid.conf'];
   const args = finalizeArguments(defaultArgs, userArgs);
+
+  console.log(args);
 }
 
 export function status(userArgs: string[]) {
   const defaultArgs = ['status -c /etc/snapraid.conf'];
   const args = finalizeArguments(defaultArgs, userArgs);
+
+  console.log(args);
 }
 
 export function sync(userArgs: string[]) {
   const defaultArgs = ['sync -c /etc/snapraid.conf'];
   const args = finalizeArguments(defaultArgs, userArgs);
+
+  console.log(args);
 }
 
 export function test() {
