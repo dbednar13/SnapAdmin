@@ -49,7 +49,9 @@ jobs:
         uses: ./.github/actions/code-setup
 
       - name: CSpell check
-        run: pnpm exec cspell lint --no-progress "**/*.{ts,tsx,js,jsx,json,yaml,yml,md}"
+        uses: streetsidesoftware/cspell-action@v8
+        with:
+          config: .cspell.config.mts
 
   Lint-Check:
     name: Lint Check
