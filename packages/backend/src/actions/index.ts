@@ -86,14 +86,14 @@ export function differences(userArgs: string[]) {
 }
 
 export function discoverMissing(userArgs: string[]) {
-  const defaultArgs = ['discovermissing -c /etc/snapraid.conf'];
+  const defaultArgs = ['discoverMissing -c /etc/snapraid.conf'];
   const args = finalizeArguments(defaultArgs, userArgs);
 
   console.log(args);
 }
 
 export function duplicateFinder(userArgs: string[]) {
-  const defaultArgs = ['duplicatefinder -c /etc/snapraid.conf'];
+  const defaultArgs = ['duplicateFinder -c /etc/snapraid.conf'];
   const args = finalizeArguments(defaultArgs, userArgs);
 
   console.log(args);

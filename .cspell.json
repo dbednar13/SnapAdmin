@@ -13,6 +13,8 @@
     "/project-words.txt",
     "dist",
     "build",
-    "coverage"
+    "coverage",
+    "pnpm-lock.yaml",
+    "yarn.lock"
   ]
 }
