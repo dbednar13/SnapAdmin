@@ -25,7 +25,10 @@ function toString(args: Record<string, string>): string {
   const parts: string[] = [];
   Object.keys(args).forEach((key) => {
     const rawValue = args[key];
-    const value = typeof rawValue === 'string' ? rawValue.trim() : String(rawValue ?? '').trim();
+    const value =
+      typeof rawValue === 'string'
+        ? rawValue.trim()
+        : String(rawValue ?? '').trim();
 
     if (key.startsWith('-')) {
       // Key is already a flag (e.g. "-c"), don't prefix another dash.
