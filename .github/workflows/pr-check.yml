@@ -51,7 +51,7 @@ jobs:
       - name: CSpell check
         uses: streetsidesoftware/cspell-action@v8
         with:
-          config: .cspell.config.mts
+          config: .cspell.json
 
   Lint-Check:
     name: Lint Check
