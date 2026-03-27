@@ -19,8 +19,16 @@ app.get('/api/health', (req: Request, res: Response) => {
 });
 
 app.post('/test', (req: Request, res: Response) => {
+  /*
+   * Test notes.
+   * This is working as I'd want it to.
+   * The ping spawns off and runs in the background, and the output is collected and printed to the console.
+   * The response is sent back immediately with the message and the output collected so far (which may be empty at that point).
+   * The ping continues to run and print output to the console until it is manually stopped or the server is restarted.
+   *
+   * To explore, move the child to a global scope, add endpoint can get the most recent output
+   */
   console.log('Received test request with body:', req.body);
-  //const command = 'ping -t -4 google.com';
 
   const child = spawn('ping', ['-t', '-4', 'google.com']);
   let output = '';
