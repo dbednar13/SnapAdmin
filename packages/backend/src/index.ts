@@ -1,3 +1,4 @@
+import { spawn } from 'child_process';
 import cors from 'cors';
 import express, { Request, Response } from 'express';
 
@@ -15,6 +16,29 @@ app.get('/', (req: Request, res: Response) => {
 
 app.get('/api/health', (req: Request, res: Response) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+app.post('/test', (req: Request, res: Response) => {
+  console.log('Received test request with body:', req.body);
+  //const command = 'ping -t -4 google.com';
+
+  const child = spawn('ping', ['-t', '-4', 'google.com']);
+  let output = '';
+
+  child.stdout.on('data', (data) => {
+    output += data.toString();
+    console.log(`stdout: ${output}`);
+  });
+
+  child.stderr.on('data', (data) => {
+    console.error(`stderr: ${data}`);
+  });
+
+  child.on('close', (code) => {
+    console.log(`child process exited with code ${code}`);
+  });
+
+  res.json({ message: 'Test endpoint', output });
 });
 
 // Start server
