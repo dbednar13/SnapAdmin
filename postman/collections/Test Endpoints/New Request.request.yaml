@@ -1,0 +1,5 @@
+$kind: http-request
+name: New Request
+url: "{{base-url}}/test"
+method: POST
+order: 1824254287759919
