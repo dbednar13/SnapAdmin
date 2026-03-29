@@ -1,9 +1,14 @@
-import { spawn } from 'child_process';
+import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
+import { CircularBuffer } from 'circle-buffer';
 import cors from 'cors';
 import express, { Request, Response } from 'express';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+let child: ChildProcessWithoutNullStreams | undefined = undefined;
+
+const buffer = new CircularBuffer({ limit: 500 });
 
 // Middleware
 app.use(cors());
@@ -30,23 +35,30 @@ app.post('/test', (req: Request, res: Response) => {
    */
   console.log('Received test request with body:', req.body);
 
-  const child = spawn('ping', ['-t', '-4', 'google.com']);
-  let output = '';
+  if (child) {
+    return res.status(400).json({
+      message:
+        'A ping process is already running. Please stop it before starting a new one.',
+    });
+  }
+
+  child = spawn('ping', ['-t', '-4', 'google.com']);
 
   child.stdout.on('data', (data) => {
-    output += data.toString();
-    console.log(`stdout: ${output}`);
+    buffer.forward(data.toString());
+    console.log(`stdout: ${buffer.current()}`);
   });
 
   child.stderr.on('data', (data) => {
-    console.error(`stderr: ${data}`);
+    buffer.forward(data.toString());
+    console.error(`stderr: ${buffer.current()}`);
   });
 
   child.on('close', (code) => {
     console.log(`child process exited with code ${code}`);
   });
 
-  res.json({ message: 'Test endpoint', output });
+  res.json({ message: 'Test endpoint', output: buffer.current() });
 });
 
 // Start server
