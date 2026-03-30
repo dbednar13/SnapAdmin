@@ -1,3 +1,5 @@
+export * from './test';
+
 /*
  * functions to manage SnapRaid actions like sync, scrub, etc.
  */
@@ -132,8 +134,4 @@ export function sync(userArgs: string[]) {
   const args = finalizeArguments(defaultArgs, userArgs);
 
   console.log(args);
-}
-
-export function test() {
-  // test function for development, doesn't call any actual snapraid.  Delete me.
 }
