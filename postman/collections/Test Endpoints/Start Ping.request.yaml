@@ -2,4 +2,4 @@ $kind: http-request
 name: Start Ping
 url: "{{base-url}}/test"
 method: POST
-order: 3000
+order: 5000
