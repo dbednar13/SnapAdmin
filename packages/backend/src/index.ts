@@ -61,6 +61,31 @@ app.post('/test', (req: Request, res: Response) => {
   res.json({ message: 'Test endpoint', output: buffer.current() });
 });
 
+app.get('/test', (req: Request, res: Response) => {
+  /*
+   * In Node.js, HTTP requests and responses are inherently streams, making it efficient to stream data in chunks using chunked transfer encoding. This approach prevents memory overload by processing data incrementally, which is essential for handling large files or real-time data. 
+
+Streaming Data from a Node.js Server
+Piping Streams: The http module allows piping readable streams directly to the writable response object, ideal for streaming files.
+Manual Writing: Use res.write() to send data incrementally for dynamic content, and res.end() to complete the response. 
+https://dev.to/bsorrentino/how-to-stream-data-over-http-using-node-and-fetch-api-4ij2#:~:text=What%20is%20HTTP%20streaming?,the%20server%20and%20the%20client.
+https://oneuptime.com/blog/post/2026-01-09-nodejs-streams-complete-guide/view#:~:text=import%20%7B%20createReadStream%20%7D%20from%20'fs,flows%20directly%20to%20response%20%7D);
+
+Consuming a Streamed HTTP Response 
+Events: Use res.on('data', ...) and res.on('end', ...) to handle incoming data chunks.
+Piping Input: Pipe the incoming response stream directly to a destination, such as a file stream. 
+https://stackoverflow.com/questions/71534322/http-stream-using-axios-node-js
+https://stackoverflow.com/questions/19580305/node-js-http-response-streams
+   */
+  if (!child) {
+    return res.status(400).json({
+      message: 'No ping process is currently running.',
+    });
+  }
+
+  res.json({ message: 'Ping process is running', output: buffer.current() });
+});
+
 // Start server
 const server = app.listen(PORT, () => {
   console.log(`🚀 Backend server running on http://localhost:${PORT}`);

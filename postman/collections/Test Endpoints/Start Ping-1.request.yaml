@@ -1,5 +1,5 @@
 $kind: http-request
-name: New Request
+name: Start Ping
 url: "{{base-url}}/test"
 method: POST
-order: 1824254287759919
+order: 2001

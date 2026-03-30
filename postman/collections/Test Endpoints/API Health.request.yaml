@@ -2,4 +2,4 @@ $kind: http-request
 name: API Health
 url: "{{base-url}}/api/health"
 method: GET
-order: 1774573609651
+order: 1000
