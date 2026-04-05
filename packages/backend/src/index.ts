@@ -1,5 +1,6 @@
 import cors from 'cors';
 import express, { Request, Response } from 'express';
+import { rateLimit } from 'express-rate-limit';
 
 import { getTest, postTest } from './actions';
 
@@ -20,11 +21,17 @@ app.get('/api/health', (req: Request, res: Response) => {
 });
 
 if (process.env.NODE_ENV !== 'production') {
-  app.post('/test', (req: Request, res: Response) => {
+  const testRateLimit = rateLimit({
+    windowMs: 60 * 1000,
+    limit: 10,
+    message: { message: 'Too many requests, please try again later.' },
+  });
+
+  app.post('/test', testRateLimit, (req: Request, res: Response) => {
     postTest(req, res);
   });
 
-  app.get('/test', (req: Request, res: Response) => {
+  app.get('/test', testRateLimit, (req: Request, res: Response) => {
     getTest(req, res);
   });
 }
