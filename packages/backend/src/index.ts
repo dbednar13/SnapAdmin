@@ -1,5 +1,3 @@
-import { ChildProcessWithoutNullStreams } from 'child_process';
-import { CircularBuffer } from 'circle-buffer';
 import cors from 'cors';
 import express, { Request, Response } from 'express';
 
@@ -7,10 +5,6 @@ import { getTest, postTest } from './actions';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-
-const child: ChildProcessWithoutNullStreams | undefined = undefined;
-
-const buffer = new CircularBuffer({ limit: 500 });
 
 // Middleware
 app.use(cors());
@@ -25,13 +19,15 @@ app.get('/api/health', (req: Request, res: Response) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-app.post('/test', (req: Request, res: Response) => {
-  postTest(child, buffer, req, res);
-});
+if (process.env.NODE_ENV !== 'production') {
+  app.post('/test', (req: Request, res: Response) => {
+    postTest(req, res);
+  });
 
-app.get('/test', (req: Request, res: Response) => {
-  getTest(child, buffer, req, res);
-});
+  app.get('/test', (req: Request, res: Response) => {
+    getTest(req, res);
+  });
+}
 
 // Start server
 const server = app.listen(PORT, () => {
