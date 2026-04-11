@@ -15,6 +15,7 @@
     "build",
     "coverage",
     "pnpm-lock.yaml",
-    "yarn.lock"
+    "yarn.lock",
+    "package.json"
   ]
 }

@@ -17,6 +17,7 @@
   "author": "",
   "license": "GPL-3.0",
   "dependencies": {
+    "circle-buffer": "^0.2.2",
     "cors": "^2.8.5",
     "express": "^5.2.1"
   },

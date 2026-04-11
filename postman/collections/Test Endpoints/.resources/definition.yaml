@@ -1,0 +1,4 @@
+$kind: collection
+name: Test Endpoints
+variables:
+  base-url: http://localhost:3000
