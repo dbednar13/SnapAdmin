@@ -1,2 +1,9 @@
+arcmsr
+hashsize
+kibi
+nohidden
+smartctl
+smartmontools
 snapadmin
 snapraid
+usbjmicron
