@@ -8,12 +8,13 @@ import {
   MAX_BLOCK_SIZE,
   MIN_AUTO_SAVE,
   MIN_BLOCK_SIZE,
-} from '../models/constants.js';
-import { CoveragePath, PathType } from '../models/coveragePath.js';
+} from '../constants/configConstants.js';
 import {
   BasicStorageProvider,
+  CoveragePath,
+  PathType,
   StorageProvider,
-} from '../storage/storageProvider.js';
+} from '../utilities';
 import {
   ADDITIONAL_PARITY_SECTION,
   AUTOSAVE_SECTION,
