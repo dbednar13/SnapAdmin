@@ -1,6 +1,3 @@
-import fs from 'fs';
-import path from 'path';
-
 import {
   DEFAULT_AUTO_SAVE,
   DEFAULT_BLOCK_SIZE,
@@ -8,13 +5,12 @@ import {
   MAX_BLOCK_SIZE,
   MIN_AUTO_SAVE,
   MIN_BLOCK_SIZE,
-} from '../constants/configConstants.js';
-import {
-  BasicStorageProvider,
-  CoveragePath,
-  PathType,
-  StorageProvider,
-} from '../utilities';
+} from '@constants';
+import { CoveragePath, PathType, StorageProvider } from '@types';
+import fs from 'fs';
+import path from 'path';
+
+import { BasicStorageProvider } from '../utilities';
 import {
   ADDITIONAL_PARITY_SECTION,
   AUTOSAVE_SECTION,

@@ -9,3 +9,8 @@ export interface StorageDevice {
   freeSpace: number;
   status: string;
 }
+
+export interface StorageProvider {
+  getPathRoot(inputPath: string): string;
+  getDriveSizes(paths: readonly string[]): number[];
+}

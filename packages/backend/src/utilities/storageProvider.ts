@@ -1,9 +1,5 @@
+import { StorageProvider } from '@types';
 import path from 'path';
-
-export interface StorageProvider {
-  getPathRoot(inputPath: string): string;
-  getDriveSizes(paths: readonly string[]): number[];
-}
 
 export class BasicStorageProvider implements StorageProvider {
   public getPathRoot(inputPath: string): string {
