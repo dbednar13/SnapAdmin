@@ -9,3 +9,9 @@ export const DEFAULT_SERVER_CONFIG: ServerConfig = {
   executablePath: DEFAULT_EXECUTABLE_PATH,
   configFilePath: DEFAULT_CONFIG_PATH,
 };
+
+export enum PathType {
+  Source = 'Source',
+  Content = 'Content',
+  Parity = 'Parity',
+}

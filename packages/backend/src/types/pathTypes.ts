@@ -1,8 +1,4 @@
-export enum PathType {
-  Source = 'Source',
-  Content = 'Content',
-  Parity = 'Parity',
-}
+import { PathType } from '@constants';
 
 export interface CoveragePath {
   fullPath: string;

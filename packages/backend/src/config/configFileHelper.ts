@@ -8,8 +8,9 @@ import {
   MAX_BLOCK_SIZE,
   MIN_AUTO_SAVE,
   MIN_BLOCK_SIZE,
+  PathType,
 } from '@constants';
-import { CoveragePath, PathType, StorageProvider } from '@types';
+import { CoveragePath, StorageProvider } from '@types';
 
 import { BasicStorageProvider } from '../utilities';
 import {
