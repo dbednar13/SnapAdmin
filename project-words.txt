@@ -6,4 +6,5 @@ smartctl
 smartmontools
 snapadmin
 snapraid
+trivago
 usbjmicron

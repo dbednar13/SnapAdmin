@@ -1,3 +1,6 @@
+import fs from 'fs';
+import path from 'path';
+
 import {
   DEFAULT_AUTO_SAVE,
   DEFAULT_BLOCK_SIZE,
@@ -7,8 +10,6 @@ import {
   MIN_BLOCK_SIZE,
 } from '@constants';
 import { CoveragePath, PathType, StorageProvider } from '@types';
-import fs from 'fs';
-import path from 'path';
 
 import { BasicStorageProvider } from '../utilities';
 import {
