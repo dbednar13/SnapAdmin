@@ -1,5 +1,6 @@
-import { StorageProvider } from '@types';
 import path from 'path';
+
+import { StorageProvider } from '@types';
 
 export class BasicStorageProvider implements StorageProvider {
   public getPathRoot(inputPath: string): string {

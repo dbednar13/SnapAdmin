@@ -12,7 +12,6 @@
     "<BUILTIN_MODULES>",
     "<THIRD_PARTY_MODULES>",
     "^@([a-zA-Z]|-)+/(.*)$",
-    "@dbednar13/(.*)",
     "^[./]"
   ],
   "importOrderSeparation": true,
