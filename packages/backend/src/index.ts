@@ -3,6 +3,7 @@ import { ChildProcessWithoutNullStreams } from 'child_process';
 import { CircularBuffer } from 'circle-buffer';
 import cors from 'cors';
 import express, { Request, Response } from 'express';
+import { StatusCodes } from 'http-status-codes';
 
 import { getTest, postTest } from './actions';
 
@@ -22,6 +23,11 @@ app.use(express.json());
 // Routes
 app.get('/', (req: Request, res: Response) => {
   res.json({ message: 'Welcome to SnapAdmin API' });
+});
+
+// Connection endpoint to subscribe to console output
+app.get('/api/connect', (req: Request, res: Response) => {
+  res.status(StatusCodes.NOT_IMPLEMENTED).json({ message: 'Not implemented' });
 });
 
 app.get('/api/health', (req: Request, res: Response) => {
