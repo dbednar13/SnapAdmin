@@ -1,4 +1,5 @@
 import { ChildProcessWithoutNullStreams } from 'child_process';
+import path from 'path';
 
 import { CircularBuffer } from 'circle-buffer';
 import cors from 'cors';
@@ -20,10 +21,7 @@ const buffer = new CircularBuffer({ limit: 500 });
 app.use(cors());
 app.use(express.json());
 
-// Routes
-app.get('/', (req: Request, res: Response) => {
-  res.json({ message: 'Welcome to SnapAdmin API' });
-});
+// ========= Routes =========
 
 // Connection endpoint to subscribe to console output
 app.get('/api/connect', (req: Request, res: Response) => {
@@ -40,6 +38,12 @@ app.post('/test', (req: Request, res: Response) => {
 
 app.get('/test', (req: Request, res: Response) => {
   getTest(state.child, buffer, req, res);
+});
+
+// ========= UI Hosting Server ======== //
+app.use(express.static(path.join(__dirname, '../webapp/dist')));
+app.get('/{*splat}', (req, res) => {
+  res.sendFile(path.join(__dirname, '../../webapp/dist/index.html'));
 });
 
 // Start server
