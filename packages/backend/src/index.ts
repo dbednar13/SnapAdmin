@@ -41,9 +41,9 @@ app.get('/test', (req: Request, res: Response) => {
 });
 
 // ========= UI Hosting Server ======== //
-app.use(express.static(path.join(__dirname, '../webapp/dist')));
+app.use(express.static(path.join(__dirname, '../dist/webapp')));
 app.get('/{*splat}', (req, res) => {
-  res.sendFile(path.join(__dirname, '../../webapp/dist/index.html'));
+  res.sendFile(path.join(__dirname, '../dist/webapp/index.html'));
 });
 
 // Start server

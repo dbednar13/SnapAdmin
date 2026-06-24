@@ -16,4 +16,8 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    outDir: '../backend/dist/webapp',
+    emptyOutDir: true, // Forces Vite to clear the folder before building
+  },
 });
