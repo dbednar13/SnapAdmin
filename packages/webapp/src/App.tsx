@@ -3,7 +3,7 @@ import './App.css';
 function App() {
   return (
     <div className="w-full min-h-screen bg-gray-50 dark:bg-neutral-900 text-slate-900 dark:text-neutral-100">
-      <div className="page-wrapper">
+      <div className="w-full md:w-2/3 mx-auto">
         <header className="sticky top-0 z-20 bg-white/90 dark:bg-neutral-900/90 backdrop-blur-md border-b border-gray-200 dark:border-neutral-700">
           <div className="px-4 py-4 flex items-center justify-between">
             <div className="flex items-center space-x-3">

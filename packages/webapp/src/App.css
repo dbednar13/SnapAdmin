@@ -1,22 +1,8 @@
-@import 'tailwindcss';
 #root {
   max-width: 100%;
   width: 100%;
   margin: 0;
   text-align: center;
-}
-
-/* Page wrapper: full width on small, 66vw (2/3 of viewport) on md+ */
-.page-wrapper {
-  width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-@media (min-width: 768px) {
-  .page-wrapper {
-    width: 66vw;
-  }
 }
 
 .logo {
