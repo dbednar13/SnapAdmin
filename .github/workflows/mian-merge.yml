@@ -1,0 +1,25 @@
+name: Main Merge
+description: Run version bump & deploy on main branch merges.
+
+on:
+  pull_request:
+    branches: [main]
+    types: [closed] # Fires when a PR is closed, regardless of whether it merged
+
+jobs:
+  Version-Bump:
+    name: Version Bump
+    runs-on: ubuntu-latest
+    if: ${{ github.event.pull_request.merged == true }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Code Setup
+        uses: ./.github/actions/code-setup
+
+      - name: PNPM Version Bump
+        uses: ./.github/actions/version-bump
+
+  #TODO:  Add Deploy Job to build and publish the built Dist
