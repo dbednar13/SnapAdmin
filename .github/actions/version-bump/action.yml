@@ -17,14 +17,15 @@ runs:
           pnpm version patch -r 
         else
           TITLE="${{ github.event.pull_request.title }}"
-          if ["${TITLE,,}" = major*]; then
+          if [ "${TITLE,,}" == major* ]; then
             pnpm version patch -r 
-          else if ["${TITLE,,}" = minor*]; then
+          elif [ "${TITLE,,}" == minor* ]; then
             pnpm version minor -r         
           else
             pnpm version patch -r
           fi
         fi
+
     - name: Push changes
       shell: bash
       run: |
