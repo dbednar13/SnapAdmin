@@ -14,18 +14,23 @@ runs:
       id: bump
       shell: bash
       run: |
-        if [ "${{ inputs.force-patch }}" = true ]; then
-          results=$(pnpm version patch -r) >>"$GITHUB_OUTPUT"
+        if [ "${{ inputs.force-patch }}" = "true" ]; then
+          results="$(pnpm version patch -r)"
         else
           TITLE="${{ github.event.pull_request.title }}"
           if [[ "${TITLE,,}" == major* ]]; then
-            results=$(pnpm version patch -r) >>"$GITHUB_OUTPUT"
+            results="$(pnpm version major -r)"
           elif [[ "${TITLE,,}" == minor* ]]; then
-            results=$(pnpm version minor -r) >>"$GITHUB_OUTPUT"
+            results="$(pnpm version minor -r)"
           else
-            results=$(pnpm version patch -r) >>"$GITHUB_OUTPUT"
+            results="$(pnpm version patch -r)"
           fi
         fi
+
+        # publish step output for later steps
+        echo "results<<EOF" >> "$GITHUB_OUTPUT"
+        printf "%s\n" "$results" >> "$GITHUB_OUTPUT"
+        echo "EOF" >> "$GITHUB_OUTPUT"
 
     - name: Push changes
       shell: bash
