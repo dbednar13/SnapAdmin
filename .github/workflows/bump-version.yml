@@ -25,6 +25,7 @@ jobs:
           ref: ${{ github.head_ref }}
           # Fetches all history, necessary if your scripts look at Git history
           fetch-depth: 0
+          token: ${{ secrets.VERSION_TOKEN }}
 
       - name: Code Setup
         uses: ./.github/actions/code-setup
