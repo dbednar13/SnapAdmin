@@ -11,18 +11,19 @@ runs:
   using: 'composite'
   steps:
     - name: PNPM version bump
+      id: bump
       shell: bash
       run: |
         if [ "${{ inputs.force-patch }}" = true ]; then
-          pnpm version patch -r 
+          results=$(pnpm version patch -r) >>"$GITHUB_OUTPUT"
         else
           TITLE="${{ github.event.pull_request.title }}"
           if [[ "${TITLE,,}" == major* ]]; then
-            pnpm version patch -r 
+            results=$(pnpm version patch -r) >>"$GITHUB_OUTPUT"
           elif [[ "${TITLE,,}" == minor* ]]; then
-            pnpm version minor -r         
+            results=$(pnpm version minor -r) >>"$GITHUB_OUTPUT"
           else
-            pnpm version patch -r
+            results=$(pnpm version patch -r) >>"$GITHUB_OUTPUT"
           fi
         fi
 
@@ -31,4 +32,6 @@ runs:
       run: |
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git add .
+        git commit -m "Change Version: ${{ steps.bump.outputs.results }}"
         git push
