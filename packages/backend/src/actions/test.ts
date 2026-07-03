@@ -34,7 +34,7 @@ export function postTest(
   state.child.stdout.on('data', (data) => {
     const text = data.toString();
     buffer.forward(text);
-    broadcast('output', text);
+    broadcast('message', text);
     console.log(`stdout: ${buffer.current()}`);
   });
 
@@ -48,7 +48,7 @@ export function postTest(
   state.child.on('close', (code) => {
     state.child = undefined;
     const message = `child process exited with code ${code}`;
-    broadcast('output', message);
+    broadcast('message', message);
     console.log(message);
   });
 

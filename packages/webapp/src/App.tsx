@@ -32,14 +32,14 @@ function App() {
     source.onmessage = (event) => {
       console.log('SSE message received:', event.data, output);
       setOutput((current) =>
-        current ? `${current}\n${event.data}` : event.data
+        current ? `${current}${event.data}` : event.data
       );
     };
 
     source.addEventListener('initial', (event) => {
       console.log('SSE initial event received:', event.data, output);
       const message = (event as MessageEvent).data;
-      setOutput((current) => (current ? `${current}\n${message}` : message));
+      setOutput((current) => (current ? `${current}${message}` : message));
     });
 
     source.addEventListener('output', (event) => {
@@ -49,7 +49,7 @@ function App() {
         event.data,
         output
       );
-      setOutput((current) => (current ? `${current}\n${message}` : message));
+      setOutput((current) => (current ? `${current}${message}` : message));
     });
 
     source.onerror = () => {
