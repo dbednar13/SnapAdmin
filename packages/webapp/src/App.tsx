@@ -17,6 +17,8 @@ function App() {
     }
   }, [output]);
 
+  console.log('Rendering App component');
+
   useEffect(() => {
     console.log('Setting up SSE connection');
     const source = new EventSource('/api/connect');
@@ -59,13 +61,14 @@ function App() {
     return () => {
       source.close();
     };
-  });
+  }, []);
 
   const startTest = async () => {
+    console.log('Starting test...');
     setTestMessage('Starting test...');
 
     try {
-      const response = await fetch('/test', {
+      const response = await fetch('/api/test', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
