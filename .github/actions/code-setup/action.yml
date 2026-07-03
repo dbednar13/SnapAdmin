@@ -9,9 +9,8 @@ runs:
       shell: bash
 
     - name: Setup Node.js (with pnpm cache)
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v6
       with:
-        node-version: 22
         cache: 'pnpm'
 
     - name: Install dependencies
