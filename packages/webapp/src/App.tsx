@@ -11,49 +11,35 @@ function App() {
 
   // Auto-scroll to the bottom whenever text updates
   useEffect(() => {
-    console.log('Output updated, scrolling to bottom');
     if (textareaRef.current) {
       textareaRef.current.scrollTop = textareaRef.current.scrollHeight;
     }
   }, [output]);
 
-  console.log('Rendering App component');
-
   useEffect(() => {
-    console.log('Setting up SSE connection');
     const source = new EventSource('/api/connect');
-
-    console.log('SSE connection established:', source);
 
     source.onopen = () => {
       setStatus('Connected to SSE');
     };
 
     source.onmessage = (event) => {
-      console.log('SSE message received:', event.data, output);
       setOutput((current) =>
         current ? `${current}${event.data}` : event.data
       );
     };
 
     source.addEventListener('initial', (event) => {
-      console.log('SSE initial event received:', event.data, output);
       const message = (event as MessageEvent).data;
       setOutput((current) => (current ? `${current}${message}` : message));
     });
 
     source.addEventListener('output', (event) => {
       const message = (event as MessageEvent).data;
-      console.log(
-        'SSE message received in custom output listener:',
-        event.data,
-        output
-      );
       setOutput((current) => (current ? `${current}${message}` : message));
     });
 
     source.onerror = () => {
-      console.log('SSE connection error');
       setStatus('SSE connection error');
       source.close();
     };
@@ -64,7 +50,6 @@ function App() {
   }, []);
 
   const startTest = async () => {
-    console.log('Starting test...');
     setTestMessage('Starting test...');
 
     try {
