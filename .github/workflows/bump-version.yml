@@ -6,9 +6,11 @@ on:
     inputs:
       force-patch:
         description: "Forces a patch bump.  Useful for when you're pushing changes to a PR, disables git tag"
-        type: boolean
-        required: false
-        default: false
+        type: choice
+        required: true
+        options:
+          - true
+          - false
 
 jobs:
   Version-Bump:
