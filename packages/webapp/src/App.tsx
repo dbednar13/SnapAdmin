@@ -67,7 +67,7 @@ function App() {
     setTestMessage('Stopping test...');
 
     try {
-      const response = await fetch('/stop', {
+      const response = await fetch('/api/stop', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
