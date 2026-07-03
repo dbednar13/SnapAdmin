@@ -1,0 +1,37 @@
+name: Bump Version
+description: Run version bump
+
+on:
+  workflow_dispatch:
+    inputs:
+      force-patch:
+        description: "Forces a patch bump.  Useful for when you're pushing changes to a PR, disables git tag"
+        type: choice
+        required: true
+        options:
+          - true
+          - false
+
+jobs:
+  Version-Bump:
+    name: Version Bump
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          # Explicitly pull the source branch of the PR
+          ref: ${{ github.head_ref }}
+          # Fetches all history, necessary if your scripts look at Git history
+          fetch-depth: 0
+
+      - name: Code Setup
+        uses: ./.github/actions/code-setup
+        with:
+          skip-install: true
+
+      - name: Bump version
+        uses: ./.github/actions/version-bump
+        with:
+          force-patch: ${{ github.event.inputs.force-patch }}

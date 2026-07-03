@@ -4,10 +4,14 @@ import { CircularBuffer } from 'circle-buffer';
 import { Request, Response } from 'express';
 
 export function postTest(
-  child: ChildProcessWithoutNullStreams | undefined,
+  state: {
+    child: ChildProcessWithoutNullStreams | undefined;
+    clients: Response[];
+  },
   buffer: CircularBuffer,
   req: Request,
-  res: Response
+  res: Response,
+  broadcast: (event: string, text: string) => void
 ) {
   /*
    * Test notes.
@@ -15,40 +19,65 @@ export function postTest(
    * The ping spawns off and runs in the background, and the output is collected and printed to the console.
    * The response is sent back immediately with the message and the output collected so far (which may be empty at that point).
    * The ping continues to run and print output to the console until it is manually stopped or the server is restarted.
-   *
-   * To explore, move the child to a global scope, add endpoint can get the most recent output
-   *
-   * Also to explore:  This was originally thought to be a websocket.  Look into SSE (Server-Sent Events) as an alternative to WebSockets for streaming data from the server to the client. SSE is simpler to implement and can be more efficient for certain use cases, such as real-time updates or notifications.
-   * https://www.npmjs.com/package/sse-express
-   * https://www.npmjs.com/package/express-sse
-   * SSE: Easily implemented in standard Express.js by setting the Content-Type: text/event-stream header and keeping the connection
    */
   console.log('Received test request with body:', req.body);
 
-  if (child) {
+  if (state.child) {
     return res.status(400).json({
       message:
         'A ping process is already running. Please stop it before starting a new one.',
     });
   }
 
-  child = spawn('ping', ['-t', '-4', 'google.com']);
+  state.child = spawn('ping', ['-t', '-4', 'google.com']);
 
-  child.stdout.on('data', (data) => {
-    buffer.forward(data.toString());
+  state.child.stdout.on('data', (data) => {
+    const text = data.toString();
+    buffer.forward(text);
+    broadcast('output', text);
     console.log(`stdout: ${buffer.current()}`);
   });
 
-  child.stderr.on('data', (data) => {
-    buffer.forward(data.toString());
+  state.child.stderr.on('data', (data) => {
+    const text = data.toString();
+    buffer.forward(text);
+    broadcast('output', text);
     console.error(`stderr: ${buffer.current()}`);
   });
 
-  child.on('close', (code) => {
-    console.log(`child process exited with code ${code}`);
+  state.child.on('close', (code) => {
+    state.child = undefined;
+    const message = `child process exited with code ${code}`;
+    broadcast('output', message);
+    console.log(message);
   });
 
   res.json({ message: 'Test endpoint', output: buffer.current() });
+}
+
+export function stopTest(
+  state: {
+    child: ChildProcessWithoutNullStreams | undefined;
+    clients: Response[];
+  },
+  buffer: CircularBuffer,
+  req: Request,
+  res: Response,
+  broadcast: (event: string, text: string) => void
+) {
+  if (!state.child) {
+    return res.status(400).json({
+      message: 'No ping process is currently running.',
+    });
+  }
+
+  const child = state.child;
+  child.kill();
+
+  const message = 'Ping process stop requested.';
+  broadcast('output', message);
+
+  return res.json({ message, output: buffer.current() });
 }
 
 export function getTest(
