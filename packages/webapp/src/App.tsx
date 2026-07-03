@@ -100,11 +100,6 @@ function App() {
 
       const data = await response.json();
       setTestMessage(data.message || 'Test stopped');
-      if (data.output) {
-        setOutput((current) =>
-          current ? `${current}\n${data.output}` : data.output
-        );
-      }
     } catch {
       setTestMessage('Failed to stop test.');
     }
