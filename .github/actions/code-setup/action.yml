@@ -15,9 +15,14 @@ runs:
       shell: bash
 
     - name: Setup Node.js (with pnpm cache)
+      if: ${{ inputs.skip-install != 'true' }}
       uses: actions/setup-node@v6
       with:
         cache: 'pnpm'
+
+    - name: Setup Node.js (without pnpm cache)
+      if: ${{ inputs.skip-install == 'true' }}
+      uses: actions/setup-node@v6
 
     - name: Install dependencies
       if: ${{ inputs.skip-install != 'true' }}
