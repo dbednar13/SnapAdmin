@@ -3,6 +3,7 @@
 TL;DR - Replace the backend websocket-like test output flow with Server-Sent Events, wire the frontend to subscribe on load, add a UI button to start the test, and render live ping output.
 
 **Steps**
+
 1. Update backend state and SSE connection logic in `packages/backend/src/index.ts`.
    - Change `state` to store `child` and an array of SSE clients.
    - Implement `/api/connect` as a true SSE endpoint, setting `Content-Type: text/event-stream`, `Cache-Control: no-cache`, and `Connection: keep-alive`.
@@ -29,17 +30,20 @@ TL;DR - Replace the backend websocket-like test output flow with Server-Sent Eve
    - Confirm the UI keeps receiving updates after page load and after starting the test.
 
 **Relevant files**
+
 - `packages/backend/src/index.ts` — implement SSE and manage SSE client connections.
 - `packages/backend/src/actions/test.ts` — broadcast child output to SSE clients.
 - `packages/webapp/src/App.tsx` — add EventSource subscription, button, and output display.
 
 **Verification**
+
 1. Start the backend and webapp locally.
 2. Open the webapp and ensure there are no SSE-related console errors.
 3. Click the new test button and verify ping output appears live in the page.
 4. Refresh the page and verify the SSE connection reopens automatically.
 
 **Decisions / assumptions**
+
 - Use `/api/connect` as the SSE subscription endpoint and retain `/test` for POST-triggering the ping.
 - The webapp will display live output from SSE rather than using a websocket library.
 - Existing CORS settings are sufficient for local frontend/backend communication.
