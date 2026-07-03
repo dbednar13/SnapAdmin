@@ -1,0 +1,33 @@
+name: 'PNPM Version Bump'
+description: 'Action to smartly bump package versions using pnpm'
+
+inputs:
+  force-patch:
+    description: "Forces a patch bump.  Useful for when you're pushing changes to a PR, disables git tag"
+    required: false
+    default: false
+
+runs:
+  using: 'composite'
+  steps:
+    - name: PNPM version bump
+      shell: bash
+      run: |
+        if [ "${{ inputs.force-patch }}" = true ]; then
+          pnpm version patch -r 
+        else
+          TITLE="${{ github.event.pull_request.title }}"
+          if ["${TITLE,,}" = major*]; then
+            pnpm version patch -r 
+          else if ["${TITLE,,}" = minor*]; then
+            pnpm version minor -r         
+          else
+            pnpm version patch -r
+          fi
+        fi
+    - name: Push changes
+      shell: bash
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git push
