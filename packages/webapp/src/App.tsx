@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import './App.css';
 
@@ -7,30 +7,51 @@ function App() {
   const [status, setStatus] = useState('Connecting to SSE...');
   const [testMessage, setTestMessage] = useState('');
 
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Auto-scroll to the bottom whenever text updates
   useEffect(() => {
+    console.log('Output updated, scrolling to bottom');
+    if (textareaRef.current) {
+      textareaRef.current.scrollTop = textareaRef.current.scrollHeight;
+    }
+  }, [output]);
+
+  useEffect(() => {
+    console.log('Setting up SSE connection');
     const source = new EventSource('/api/connect');
+
+    console.log('SSE connection established:', source);
 
     source.onopen = () => {
       setStatus('Connected to SSE');
     };
 
     source.onmessage = (event) => {
+      console.log('SSE message received:', event.data, output);
       setOutput((current) =>
         current ? `${current}\n${event.data}` : event.data
       );
     };
 
     source.addEventListener('initial', (event) => {
+      console.log('SSE initial event received:', event.data, output);
       const message = (event as MessageEvent).data;
       setOutput((current) => (current ? `${current}\n${message}` : message));
     });
 
     source.addEventListener('output', (event) => {
       const message = (event as MessageEvent).data;
+      console.log(
+        'SSE message received in custom output listener:',
+        event.data,
+        output
+      );
       setOutput((current) => (current ? `${current}\n${message}` : message));
     });
 
     source.onerror = () => {
+      console.log('SSE connection error');
       setStatus('SSE connection error');
       source.close();
     };
@@ -38,7 +59,7 @@ function App() {
     return () => {
       source.close();
     };
-  }, []);
+  });
 
   const startTest = async () => {
     setTestMessage('Starting test...');
@@ -173,6 +194,7 @@ function App() {
               <textarea
                 readOnly
                 value={output}
+                ref={textareaRef}
                 className="min-h-56 w-full resize-none rounded-md border border-gray-300 bg-gray-50 p-3 text-sm font-mono text-slate-900 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
               />
             </div>

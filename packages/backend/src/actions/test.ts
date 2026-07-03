@@ -41,7 +41,7 @@ export function postTest(
   state.child.stderr.on('data', (data) => {
     const text = data.toString();
     buffer.forward(text);
-    broadcast('output', text);
+    broadcast('message', text);
     console.error(`stderr: ${buffer.current()}`);
   });
 
@@ -52,7 +52,7 @@ export function postTest(
     console.log(message);
   });
 
-  res.json({ message: 'Test endpoint', output: buffer.current() });
+  //res.json({ message: 'Test endpoint', output: buffer.current() });
 }
 
 export function stopTest(
