@@ -1,8 +1,18 @@
+import {
+  CHECK_VERB_HELP,
+  DIFF_VERB_HELP,
+  DUPLICATE_VERB_HELP,
+  FIX_VERB_HELP,
+  STATUS_VERB_HELP,
+  SYNC_VERB_HELP,
+  type VerbHelp,
+} from '.';
+
 export type Command = {
   title: string;
   command: string;
   description: string;
-  helpContext: string[];
+  helpContext: VerbHelp;
 };
 
 export const commands: Command[] = [
@@ -11,60 +21,60 @@ export const commands: Command[] = [
     command: '',
     description:
       'Show differences between the current state and the last sync.',
-    helpContext: [],
+    helpContext: DIFF_VERB_HELP,
   },
   {
     title: 'Scrub',
     command: '',
     description:
       'Scrubs the array, checking for silent and IO errors.  Defaults to "-p100 -o0"',
-    helpContext: [],
+    helpContext: SYNC_VERB_HELP,
   },
   {
     title: 'Status',
     command: '',
     description:
       'A summary of the state of the disk array upto the last sync time.',
-    helpContext: [],
+    helpContext: STATUS_VERB_HELP,
   },
   {
     title: 'Sync',
     command: '',
     description:
       'Synchronize with any changes that may have occurred since the last run.',
-    helpContext: [],
+    helpContext: SYNC_VERB_HELP,
   },
   {
     title: 'Check',
     command: '',
     description:
       "Check the snapshot to confirm it's integrity.  Default -a for hash only.",
-    helpContext: [],
+    helpContext: CHECK_VERB_HELP,
   },
   {
     title: 'Fix',
     command: '',
     description: 'Fix errors set by the scrub command.  Defaults to using "-e"',
-    helpContext: [],
+    helpContext: FIX_VERB_HELP,
   },
   {
     title: 'Duplicate Finder',
     command: '',
     description:
       'Lists all the duplicate files.  Two files are assumed to be equal if their hashes match.',
-    helpContext: [],
+    helpContext: DUPLICATE_VERB_HELP,
   },
   {
     title: 'Force Full Sync',
     command: '',
     description: 'Sync with the "-F" to recompute the full parity',
-    helpContext: [],
+    helpContext: SYNC_VERB_HELP,
   },
   {
     title: 'Discover Missing',
     command: '',
     description:
       'Check the snapshot for missing files. Default --filter-missing',
-    helpContext: [],
+    helpContext: CHECK_VERB_HELP,
   },
 ];
