@@ -1,6 +1,10 @@
 import { type HelpText, STANDARD_OPTIONS, type VerbHelp } from './helpText';
 
-export const StatusVerb = '';
+export const StatusVerb = {
+  verb: 'status',
+  helpText:
+    'A summary of the state of the disk array, upto the last sync time.',
+};
 
 /*
 {

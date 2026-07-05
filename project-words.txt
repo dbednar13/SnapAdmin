@@ -4,10 +4,12 @@ elif
 esbuild
 hashsize
 kibi
+nocopy
 nohidden
 smartctl
 smartmontools
 snapadmin
 snapraid
 trivago
+undelete
 usbjmicron

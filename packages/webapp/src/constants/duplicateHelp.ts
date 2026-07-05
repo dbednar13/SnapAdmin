@@ -1,6 +1,10 @@
 import { type HelpText, STANDARD_OPTIONS, type VerbHelp } from './helpText';
 
-export const DuplicateVerb = '';
+export const DuplicateVerb = {
+  verb: 'duplicate',
+  helpText:
+    'Lists all the duplicate files. Two files are assumed equal if their hashes are matching.',
+};
 
 /*
 {
