@@ -1,9 +1,44 @@
-import type { VerbHelp } from '../../constants';
+import { COMMANDS, type Command } from '../../constants';
 
-export type ActionButton = {
-  label: string;
-  command: string;
-  description: string;
+export type ActionButton = Command & {
   icon: string;
-  helpInfo: VerbHelp;
 };
+
+export const buttons: ActionButton[] = [
+  {
+    ...COMMANDS.diff,
+    icon: '',
+  },
+  {
+    ...COMMANDS.scrub,
+    icon: '',
+  },
+  {
+    ...COMMANDS.status,
+    icon: '',
+  },
+  {
+    ...COMMANDS.sync,
+    icon: '',
+  },
+  {
+    ...COMMANDS.check,
+    icon: '',
+  },
+  {
+    ...COMMANDS.fix,
+    icon: '',
+  },
+  {
+    ...COMMANDS.duplicate,
+    icon: '',
+  },
+  {
+    ...COMMANDS.forceFullSync,
+    icon: '',
+  },
+  {
+    ...COMMANDS.discoverMissing,
+    icon: '',
+  },
+];
