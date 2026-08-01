@@ -1,4 +1,4 @@
-import { COMMANDS, type Command } from '../../constants';
+import { COMMANDS, type Command } from '@constants';
 
 export type ActionButton = Command & {
   icon: string;
