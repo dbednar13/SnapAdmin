@@ -1,44 +1,57 @@
 import { COMMANDS, type Command } from '@constants';
 
+import type { SvgIconComponent } from '@mui/icons-material';
+import {
+  AssessmentTwoTone,
+  AutoFixHighTwoTone,
+  BuildTwoTone,
+  CleaningServicesTwoTone,
+  CompareArrowsTwoTone,
+  ContentCopyTwoTone,
+  FactCheckTwoTone,
+  SearchOffTwoTone,
+  SyncAltTwoTone,
+} from '@mui/icons-material';
+
 export type ActionButton = Command & {
-  icon: string;
+  icon: SvgIconComponent;
 };
 
 export const buttons: ActionButton[] = [
   {
     ...COMMANDS.diff,
-    icon: '',
+    icon: CompareArrowsTwoTone,
   },
   {
     ...COMMANDS.scrub,
-    icon: '',
+    icon: CleaningServicesTwoTone,
   },
   {
     ...COMMANDS.status,
-    icon: '',
+    icon: AssessmentTwoTone,
   },
   {
     ...COMMANDS.sync,
-    icon: '',
+    icon: SyncAltTwoTone,
   },
   {
     ...COMMANDS.check,
-    icon: '',
+    icon: FactCheckTwoTone,
   },
   {
     ...COMMANDS.fix,
-    icon: '',
+    icon: BuildTwoTone,
   },
   {
     ...COMMANDS.duplicate,
-    icon: '',
+    icon: ContentCopyTwoTone,
   },
   {
     ...COMMANDS.forceFullSync,
-    icon: '',
+    icon: AutoFixHighTwoTone,
   },
   {
     ...COMMANDS.discoverMissing,
-    icon: '',
+    icon: SearchOffTwoTone,
   },
 ];
