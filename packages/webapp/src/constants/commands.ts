@@ -1,12 +1,10 @@
-import {
-  CHECK_VERB_HELP,
-  DIFF_VERB_HELP,
-  DUPLICATE_VERB_HELP,
-  FIX_VERB_HELP,
-  STATUS_VERB_HELP,
-  SYNC_VERB_HELP,
-  type VerbHelp,
-} from '.';
+import { CHECK_VERB_HELP } from './checkHelp';
+import { DIFF_VERB_HELP } from './diffHelp';
+import { DUPLICATE_VERB_HELP } from './duplicateHelp';
+import { FIX_VERB_HELP } from './fixHelp';
+import { type VerbHelp } from './helpText';
+import { STATUS_VERB_HELP } from './statusHelp';
+import { SYNC_VERB_HELP } from './syncHelp';
 
 export type Command = {
   title: string;
