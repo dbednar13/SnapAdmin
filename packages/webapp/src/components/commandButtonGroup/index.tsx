@@ -49,6 +49,12 @@ const CommandButtonGroup = () => {
                 </div>
               </div>
 
+              {/*
+               * TODO: Put a help button in the upper right corner of the card
+               * that will show the help text in a modal instead of a hover
+               * tooltip. This will allow for more space to show the help text and
+               * options.
+               */}
               <div className="pointer-events-none absolute inset-x-3 bottom-3 translate-y-2 opacity-0 transition-all duration-200 group-hover:translate-y-0 group-hover:opacity-100">
                 <div className="max-h-52 overflow-y-auto rounded-xl border border-slate-200 bg-slate-900/95 p-3 text-left text-xs leading-5 text-slate-100 shadow-xl dark:border-neutral-700">
                   <div className="mb-2 font-semibold text-white">
