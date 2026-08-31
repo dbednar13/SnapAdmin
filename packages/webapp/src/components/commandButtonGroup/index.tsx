@@ -26,7 +26,7 @@ const CommandButtonGroup = () => {
               type="button"
               key={button.command}
               title={helpText || 'No additional help available.'}
-              className="group relative h-52 overflow-hidden rounded-2xl border-2 border-dashed border-slate-300 bg-white/80 p-4 text-left shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-indigo-300 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:border-neutral-700 dark:bg-neutral-800/70 dark:focus:ring-offset-neutral-900"
+              className="group relative overflow-hidden rounded-2xl border-2 border-dashed border-slate-300 bg-white/80 p-4 text-left shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-indigo-300 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:border-neutral-700 dark:bg-neutral-800/70 dark:focus:ring-offset-neutral-900"
             >
               <div className="flex h-full flex-col justify-between">
                 <div className="flex items-start gap-3">
@@ -44,7 +44,7 @@ const CommandButtonGroup = () => {
                   </div>
                 </div>
 
-                <div className="mt-3 text-sm leading-6 text-slate-600 dark:text-neutral-300">
+                <div className="mt-3 text-sm leading-6 text-slate-600 dark:text-neutral-300 text-center">
                   {button.description}
                 </div>
               </div>
