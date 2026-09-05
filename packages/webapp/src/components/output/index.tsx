@@ -5,6 +5,7 @@ const OutputArea = () => {
   const [status, setStatus] = useState('Connecting...');
 
   // Placeholder for command message; can be updated when a command is sent
+  // @ts-expect-error TS6133: the setter is reserved for command dispatch
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [commandMessage, setCommandMessage] = useState('');
 
