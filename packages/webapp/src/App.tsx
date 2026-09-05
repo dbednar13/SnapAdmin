@@ -1,6 +1,5 @@
 import './App.css';
-import CommandButtonGroup from './components/commandButtonGroup';
-import OutputArea from './components/output';
+import CommandCenter from './components/commandCenter';
 
 function App() {
   return (
@@ -15,7 +14,7 @@ function App() {
               <div>
                 <div className="font-semibold">SnapAdmin</div>
                 <div className="text-xs text-gray-500 dark:text-neutral-400">
-                  Admin UI placeholder
+                  Snapraid Web Portal
                 </div>
               </div>
             </div>
@@ -27,23 +26,14 @@ function App() {
                 Link 2
               </button>
               <button className="px-3 py-1 rounded bg-indigo-600 text-white">
-                Action
+                Command Center
               </button>
             </nav>
           </div>
         </header>
 
         <main className="w-full px-4 py-6">
-          <section className="mb-6">
-            <h1 className="text-2xl font-semibold">Overview</h1>
-            <p className="text-sm text-gray-600 dark:text-neutral-400 mt-1">
-              Header pinned above; grid below shows placeholders.
-            </p>
-          </section>
-
-          <CommandButtonGroup />
-
-          <OutputArea />
+          <CommandCenter />
         </main>
       </div>
     </div>

@@ -1,3 +1,5 @@
+import { URL, fileURLToPath } from 'node:url';
+
 import { defineConfig } from 'vite';
 
 import tailwindcss from '@tailwindcss/vite';
@@ -7,6 +9,11 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   base: './',
   plugins: [react(), tailwindcss()],
+  resolve: {
+    alias: {
+      '@constants': fileURLToPath(new URL('./src/constants', import.meta.url)),
+    },
+  },
   server: {
     proxy: {
       '/api': {
