@@ -23,9 +23,9 @@ export const COMMANDS: Record<string, Command> = {
   },
   scrub: {
     title: 'Scrub',
-    command: 'scrub -p100 -o0',
+    command: 'scrub -p 100 -o 0',
     description:
-      'Scrubs the array, checking for silent and IO errors.  Defaults to "-p100 -o0"',
+      'Scrubs the array, checking for silent and IO errors.  Defaults to "-p 100 -o 0"',
     helpContext: SYNC_VERB_HELP,
   },
   status: {

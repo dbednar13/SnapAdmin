@@ -1,7 +1,22 @@
+import { mergeCommandAndAdditionalArgs } from 'common';
+import { useState } from 'react';
+
+import AdditionalArguments from '../additionalArguments';
 import CommandButtonGroup from '../commandButtonGroup';
 import OutputArea from '../output';
 
 const CommandCenter = () => {
+  const [additionalCommandArgs, setAdditionalCommandArgs] = useState('');
+
+  const handleCommandExecution = (command: string) => {
+    const fullCommand = mergeCommandAndAdditionalArgs(
+      command,
+      additionalCommandArgs
+    );
+
+    console.log('fullCommand', fullCommand);
+  };
+
   return (
     <>
       <section className="mb-6">
@@ -11,13 +26,12 @@ const CommandCenter = () => {
         </p>
       </section>
 
-      <CommandButtonGroup />
+      <CommandButtonGroup onCommandExecution={handleCommandExecution} />
+
+      <AdditionalArguments onValueChange={setAdditionalCommandArgs} />
 
       {/*
        * TODO:
-       *    Add line for additional/override command arguments
-       *    Get clicked command from CBG
-       *    Format command with additional args
        *    Send command to backend
        */}
 
