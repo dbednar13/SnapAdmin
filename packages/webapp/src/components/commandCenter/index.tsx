@@ -15,6 +15,8 @@ const CommandCenter = () => {
     );
 
     console.log('fullCommand', fullCommand);
+
+    //TODO: Send command to backend.  We probably need an "execute" endpoint.
   };
 
   return (
@@ -29,11 +31,6 @@ const CommandCenter = () => {
       <CommandButtonGroup onCommandExecution={handleCommandExecution} />
 
       <AdditionalArguments onValueChange={setAdditionalCommandArgs} />
-
-      {/*
-       * TODO:
-       *    Send command to backend
-       */}
 
       <OutputArea />
     </>
