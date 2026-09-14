@@ -74,6 +74,16 @@ app.post('/api/stop', (req: Request, res: Response) => {
   stopTest(state, buffer, req, res, broadcastSSE);
 });
 
+app.post('/api/execute', (req: Request, res: Response) => {
+  const { command } = req.body;
+  // TODO: Implement command execution logic here
+  // For now, just return the command received
+  // Check if command has a value
+  // trust nothing, re-do all the sanitization.
+  // build up the command make sure we add "snapraid -c /path/to/snapraid.conf" to the front of the command.
+  res.json({ status: 'success', command });
+});
+
 // ========= UI Hosting Server ======== //
 app.use(express.static(path.join(__dirname, '../dist/webapp')));
 app.get('/{*splat}', (req, res) => {
