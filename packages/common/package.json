@@ -1,6 +1,6 @@
 {
   "name": "common",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "description": "Shared SnapAdmin utilities and command definitions",
   "type": "module",
   "main": "./src/index.ts",
@@ -25,7 +25,6 @@
   ],
   "author": "",
   "license": "GPL-3.0",
-  "dependencies": {},
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@trivago/prettier-plugin-sort-imports": "^6.0.2",
