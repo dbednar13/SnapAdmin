@@ -1,13 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 
-const OutputArea = () => {
+type OutputAreaProps = {
+  commandMessage: string;
+};
+
+const OutputArea = ({ commandMessage }: OutputAreaProps) => {
   const [output, setOutput] = useState('');
   const [status, setStatus] = useState('Connecting...');
-
-  // Placeholder for command message; can be updated when a command is sent
-  // @ts-expect-error TS6133: the setter is reserved for command dispatch
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [commandMessage, setCommandMessage] = useState('');
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 

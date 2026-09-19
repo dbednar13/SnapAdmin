@@ -5,7 +5,8 @@ import { CircularBuffer } from 'circle-buffer';
 import cors from 'cors';
 import express, { Request, Response } from 'express';
 
-import { postTest, stopTest } from './actions';
+import { executeCommand } from './actions';
+import { postTest, stopTest } from './actions/test';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -72,6 +73,10 @@ app.post('/api/test', (req: Request, res: Response) => {
 
 app.post('/api/stop', (req: Request, res: Response) => {
   stopTest(state, buffer, req, res, broadcastSSE);
+});
+
+app.post('/api/execute', (req: Request, res: Response) => {
+  executeCommand(state, buffer, req, res, broadcastSSE);
 });
 
 // ========= UI Hosting Server ======== //

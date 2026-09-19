@@ -1,137 +1,92 @@
-export * from './test';
+import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
 
-/*
- * functions to manage SnapRaid actions like sync, scrub, etc.
- */
+import { CircularBuffer } from 'circle-buffer';
+import { sanitizeCommandInput } from 'common';
+import { Request, Response } from 'express';
 
-function splitArguments(arg: string): [string, string[]] {
-  const newArg = arg.split(' ');
-  const key = newArg[0];
+export function executeCommand(
+  state: {
+    child: ChildProcessWithoutNullStreams | undefined;
+    clients: Response[];
+  },
+  buffer: CircularBuffer,
+  req: Request,
+  res: Response,
+  broadcast: (event: string, text: string) => void
+) {
+  const { command } = req.body as {
+    command?: string;
+  };
 
-  return [key, newArg];
-}
+  console.log('Received command:', command, req.body);
 
-function processArg(arg: string[]): string {
-  // process a single command line argument for SnapRaid commands.
-  let value = '';
-
-  if (arg.length > 1) {
-    for (let i = 1; i < arg.length; i++) {
-      value += arg[i] + ' ';
-    }
+  if (state.child) {
+    return res.status(400).json({
+      message:
+        'A SnapRaid process is already running. Please stop it before starting a new one.',
+    });
   }
-  return value.trim();
-}
 
-function toString(args: Record<string, string>): string {
-  const parts: string[] = [];
-  Object.keys(args).forEach((key) => {
-    const rawValue = args[key];
-    const value =
-      typeof rawValue === 'string'
-        ? rawValue.trim()
-        : String(rawValue ?? '').trim();
+  if (!command || typeof command !== 'string') {
+    return res.status(400).json({
+      message: 'Command is required.',
+    });
+  }
 
-    if (key.startsWith('-')) {
-      // Key is already a flag (e.g. "-c"), don't prefix another dash.
-      if (value) {
-        parts.push(key, value);
-      } else {
-        parts.push(key);
-      }
-    } else {
-      // Key is a subcommand or positional argument (e.g. "check").
-      if (value) {
-        parts.push(key, value);
-      } else {
-        parts.push(key);
-      }
-    }
+  const sanitizedCommand = sanitizeCommandInput(command);
+
+  const normalizedCommand = sanitizedCommand
+    .trim()
+    .replace(/^\s*\/usr\/bin\/snapraid\s*/i, '')
+    .replace(/^\s*snapraid\s*/i, '')
+    .trim();
+
+  if (!normalizedCommand) {
+    return res.status(400).json({
+      message: 'Command is invalid.',
+    });
+  }
+
+  //const configPath = sanitizeValue('/etc/snapraid.conf');
+  const args = [...normalizedCommand.split(/\s+/)];
+
+  try {
+    state.child = spawn('snapraid', args, {
+      shell: false,
+      env: process.env,
+    });
+  } catch (error) {
+    console.error('Error spawning snapraid process:', error);
+    return res.status(500).json({
+      message: 'Failed to start SnapRaid process.',
+    });
+  }
+
+  state.child.stdout.on('data', (data) => {
+    const text = data.toString();
+    buffer.forward(text);
+    broadcast('message', text);
   });
-  return parts.join(' ');
-}
 
-function finalizeArguments(defaultArgs: string[], userArgs: string[]): string {
-  // finalize command line arguments for SnapRaid commands.
-  const config: Record<string, string> = {};
+  state.child.stderr.on('data', (data) => {
+    const text = data.toString();
+    buffer.forward(text);
+    broadcast('message', text);
+  });
 
-  for (const arg of defaultArgs) {
-    const [key, newArg] = splitArguments(arg);
+  state.child.on('close', (code) => {
+    state.child = undefined;
+    const message = `child process exited with code ${code}`;
+    broadcast('message', message);
+  });
 
-    const value = processArg(newArg);
+  state.child.on('error', (error) => {
+    state.child = undefined;
+    const message = `Error spawning snapraid process: ${error.message}`;
+    broadcast('message', message);
+  });
 
-    config[key] = value;
-  }
-
-  for (const arg of userArgs) {
-    const [key, newArg] = splitArguments(arg);
-    const value = processArg(newArg);
-
-    config[key] = value;
-  }
-
-  return toString(config);
-}
-
-export function check(userArgs: string[]) {
-  const defaultArgs = ['check -c /etc/snapraid.conf'];
-  const args = finalizeArguments(defaultArgs, userArgs);
-
-  console.log(args);
-}
-
-export function differences(userArgs: string[]) {
-  const defaultArgs = ['differences -c /etc/snapraid.conf'];
-  const args = finalizeArguments(defaultArgs, userArgs);
-
-  console.log(args);
-}
-
-export function discoverMissing(userArgs: string[]) {
-  const defaultArgs = ['discoverMissing -c /etc/snapraid.conf'];
-  const args = finalizeArguments(defaultArgs, userArgs);
-
-  console.log(args);
-}
-
-export function duplicateFinder(userArgs: string[]) {
-  const defaultArgs = ['duplicateFinder -c /etc/snapraid.conf'];
-  const args = finalizeArguments(defaultArgs, userArgs);
-
-  console.log(args);
-}
-
-export function fix(userArgs: string[]) {
-  const defaultArgs = ['fix -c /etc/snapraid.conf'];
-  const args = finalizeArguments(defaultArgs, userArgs);
-
-  console.log(args);
-}
-
-export function forceFullSync(userArgs: string[]) {
-  const defaultArgs = ['sync -c /etc/snapraid.conf -f'];
-  const args = finalizeArguments(defaultArgs, userArgs);
-
-  console.log(args);
-}
-
-export function scrub(userArgs: string[]) {
-  const defaultArgs = ['scrub -c /etc/snapraid.conf'];
-  const args = finalizeArguments(defaultArgs, userArgs);
-
-  console.log(args);
-}
-
-export function status(userArgs: string[]) {
-  const defaultArgs = ['status -c /etc/snapraid.conf'];
-  const args = finalizeArguments(defaultArgs, userArgs);
-
-  console.log(args);
-}
-
-export function sync(userArgs: string[]) {
-  const defaultArgs = ['sync -c /etc/snapraid.conf'];
-  const args = finalizeArguments(defaultArgs, userArgs);
-
-  console.log(args);
+  return res.status(200).json({
+    message: `Started Command ${normalizedCommand}`,
+  });
 }

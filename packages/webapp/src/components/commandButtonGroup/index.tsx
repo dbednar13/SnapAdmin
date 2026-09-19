@@ -4,7 +4,13 @@ import { Close, HelpOutlined } from '@mui/icons-material';
 
 import { type ActionButton, buttons } from './buttons';
 
-const CommandButtonGroup = () => {
+type CommandButtonGroupProps = {
+  onCommandExecution?: (command: string) => void;
+};
+
+const CommandButtonGroup = ({
+  onCommandExecution,
+}: CommandButtonGroupProps) => {
   const [activeHelpCommand, setActiveHelpCommand] = useState<string | null>(
     null
   );
@@ -36,7 +42,7 @@ const CommandButtonGroup = () => {
           return (
             <div
               key={button.command}
-              onClick={() => console.log('clicked', button.command)}
+              onClick={() => onCommandExecution?.(button.command)}
               className="group relative overflow-hidden rounded-2xl border-2 border-dashed border-slate-300 bg-white/80 p-4 text-left shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-indigo-300 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:border-neutral-700 dark:bg-neutral-800/70 dark:focus:ring-offset-neutral-900"
             >
               <button

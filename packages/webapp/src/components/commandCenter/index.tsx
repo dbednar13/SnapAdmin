@@ -1,7 +1,35 @@
+import { mergeCommandAndAdditionalArgs } from 'common';
+import { useState } from 'react';
+
+import AdditionalArguments from '../additionalArguments';
 import CommandButtonGroup from '../commandButtonGroup';
 import OutputArea from '../output';
 
 const CommandCenter = () => {
+  const [additionalCommandArgs, setAdditionalCommandArgs] = useState('');
+  const [commandMessage, setCommandMessage] = useState('');
+
+  const handleCommandExecution = async (command: string) => {
+    const fullCommand = mergeCommandAndAdditionalArgs(
+      command,
+      additionalCommandArgs
+    );
+
+    console.log('fullCommand', fullCommand);
+
+    const response = await fetch('/api/execute', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ command: fullCommand }),
+    });
+
+    const data = await response.json();
+
+    setCommandMessage(data.message || 'SnapRaid command started');
+  };
+
   return (
     <>
       <section className="mb-6">
@@ -11,17 +39,11 @@ const CommandCenter = () => {
         </p>
       </section>
 
-      <CommandButtonGroup />
+      <CommandButtonGroup onCommandExecution={handleCommandExecution} />
 
-      {/*
-       * TODO:
-       *    Add line for additional/override command arguments
-       *    Get clicked command from CBG
-       *    Format command with additional args
-       *    Send command to backend
-       */}
+      <AdditionalArguments onValueChange={setAdditionalCommandArgs} />
 
-      <OutputArea />
+      <OutputArea commandMessage={commandMessage} />
     </>
   );
 };

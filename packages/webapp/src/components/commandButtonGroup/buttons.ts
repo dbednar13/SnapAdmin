@@ -1,4 +1,4 @@
-import { COMMANDS, type Command } from '@constants';
+import { COMMANDS, type Command } from 'common';
 
 import type { SvgIconComponent } from '@mui/icons-material';
 import {
