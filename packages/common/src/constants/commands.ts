@@ -1,10 +1,10 @@
-import { CHECK_VERB_HELP } from './checkHelp';
-import { DIFF_VERB_HELP } from './diffHelp';
-import { DUPLICATE_VERB_HELP } from './duplicateHelp';
-import { FIX_VERB_HELP } from './fixHelp';
-import { type VerbHelp } from './helpText';
-import { STATUS_VERB_HELP } from './statusHelp';
-import { SYNC_VERB_HELP } from './syncHelp';
+import { CHECK_VERB_HELP } from './checkHelp.js';
+import { DIFF_VERB_HELP } from './diffHelp.js';
+import { DUPLICATE_VERB_HELP } from './duplicateHelp.js';
+import { FIX_VERB_HELP } from './fixHelp.js';
+import { type VerbHelp } from './helpText.js';
+import { STATUS_VERB_HELP } from './statusHelp.js';
+import { SYNC_VERB_HELP } from './syncHelp.js';
 
 export type Command = {
   title: string;

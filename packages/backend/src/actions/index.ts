@@ -1,7 +1,7 @@
 import { ChildProcessWithoutNullStreams, spawn } from 'child_process';
 
 import { CircularBuffer } from 'circle-buffer';
-import { sanitizeAdditionalArguments } from 'common';
+import { sanitizeCommandInput } from 'common';
 import { Request, Response } from 'express';
 
 export function executeCommand(
@@ -14,7 +14,11 @@ export function executeCommand(
   res: Response,
   broadcast: (event: string, text: string) => void
 ) {
-  const { command } = req.body as { command?: string };
+  const { command } = req.body as {
+    command?: string;
+  };
+
+  console.log('Received command:', command, req.body);
 
   if (state.child) {
     return res.status(400).json({
@@ -29,7 +33,7 @@ export function executeCommand(
     });
   }
 
-  const sanitizedCommand = sanitizeAdditionalArguments(command);
+  const sanitizedCommand = sanitizeCommandInput(command);
 
   const normalizedCommand = sanitizedCommand
     .trim()
@@ -46,10 +50,17 @@ export function executeCommand(
   //const configPath = sanitizeValue('/etc/snapraid.conf');
   const args = [...normalizedCommand.split(/\s+/)];
 
-  state.child = spawn('snapraid', args, {
-    shell: false,
-    env: process.env,
-  });
+  try {
+    state.child = spawn('snapraid', args, {
+      shell: false,
+      env: process.env,
+    });
+  } catch (error) {
+    console.error('Error spawning snapraid process:', error);
+    return res.status(500).json({
+      message: 'Failed to start SnapRaid process.',
+    });
+  }
 
   state.child.stdout.on('data', (data) => {
     const text = data.toString();
@@ -66,6 +77,12 @@ export function executeCommand(
   state.child.on('close', (code) => {
     state.child = undefined;
     const message = `child process exited with code ${code}`;
+    broadcast('message', message);
+  });
+
+  state.child.on('error', (error) => {
+    state.child = undefined;
+    const message = `Error spawning snapraid process: ${error.message}`;
     broadcast('message', message);
   });
 

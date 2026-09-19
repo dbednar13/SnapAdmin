@@ -1,4 +1,4 @@
-import { type HelpText, STANDARD_OPTIONS, type VerbHelp } from './helpText';
+import { type HelpText, STANDARD_OPTIONS, type VerbHelp } from './helpText.js';
 
 export const FixVerb = {
   verb: 'fix',

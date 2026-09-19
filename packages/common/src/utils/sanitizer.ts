@@ -7,7 +7,7 @@ import {
   STANDARD_OPTIONS,
   STATUS_OPTIONS,
   SYNC_OPTIONS,
-} from '../constants';
+} from '../constants/index.js';
 
 const ARGUMENTS_WITH_VALUES = new Set([
   'log',
@@ -41,8 +41,11 @@ const ALLOWED_COMMAND_OPTIONS = new Set(
   ]),
 );
 
+export const test = 'abc';
+export const test2 = 'def';
+
 export const sanitizeCommandInput = (value: string) => {
-  return value
+  value = value
     .replace(/`[^`]*`/g, ' ')
     .replace(/\$\([^)]*\)/g, ' ')
     .replace(/&&|\|\||[;&|<>]/g, ' ')
@@ -50,6 +53,8 @@ export const sanitizeCommandInput = (value: string) => {
     .split(/\s+/)
     .filter(Boolean)
     .join(' ');
+
+  return value;
 };
 
 const getOptionKey = (token: string) => {
