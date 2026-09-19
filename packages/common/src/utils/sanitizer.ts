@@ -93,7 +93,9 @@ const isAllowedOptionToken = (token: string) => {
   return optionKey ? ALLOWED_COMMAND_OPTIONS.has(optionKey) : false;
 };
 
-const extractOptionEntries = (tokens: string[]) => {
+const extractOptionEntries = (
+  tokens: string[],
+): Array<{ key: string; tokens: string[] }> => {
   const entries: Array<{ key: string; tokens: string[] }> = [];
 
   for (let index = 0; index < tokens.length; index += 1) {
@@ -121,7 +123,7 @@ const extractOptionEntries = (tokens: string[]) => {
   return entries;
 };
 
-export const sanitizeAdditionalArguments = (value: string) => {
+export const sanitizeAdditionalArguments = (value: string): string => {
   const normalized = sanitizeCommandInput(value);
   const tokens = normalized.split(/\s+/).filter(Boolean);
   const sanitized: string[] = [];
@@ -202,7 +204,7 @@ export const sanitizeAdditionalArguments = (value: string) => {
 export const mergeCommandAndAdditionalArgs = (
   command: string,
   additionalArgs: string,
-) => {
+): string => {
   const sanitizedCommand = sanitizeCommandInput(command);
   const sanitizedAdditionalArgs = sanitizeAdditionalArguments(additionalArgs);
 

@@ -7,8 +7,9 @@ import OutputArea from '../output';
 
 const CommandCenter = () => {
   const [additionalCommandArgs, setAdditionalCommandArgs] = useState('');
+  const [commandMessage, setCommandMessage] = useState('');
 
-  const handleCommandExecution = (command: string) => {
+  const handleCommandExecution = async (command: string) => {
     const fullCommand = mergeCommandAndAdditionalArgs(
       command,
       additionalCommandArgs
@@ -16,7 +17,17 @@ const CommandCenter = () => {
 
     console.log('fullCommand', fullCommand);
 
-    //TODO: Send command to backend.  We probably need an "execute" endpoint.
+    const response = await fetch('/api/execute', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ command: fullCommand }),
+    });
+
+    const data = await response.json();
+
+    setCommandMessage(data.message || 'SnapRaid command started');
   };
 
   return (
@@ -32,7 +43,7 @@ const CommandCenter = () => {
 
       <AdditionalArguments onValueChange={setAdditionalCommandArgs} />
 
-      <OutputArea />
+      <OutputArea commandMessage={commandMessage} />
     </>
   );
 };

@@ -5,7 +5,8 @@ import { CircularBuffer } from 'circle-buffer';
 import cors from 'cors';
 import express, { Request, Response } from 'express';
 
-import { postTest, stopTest } from './actions';
+import { executeCommand } from './actions';
+import { postTest, stopTest } from './actions/test';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -75,13 +76,7 @@ app.post('/api/stop', (req: Request, res: Response) => {
 });
 
 app.post('/api/execute', (req: Request, res: Response) => {
-  const { command } = req.body;
-  // TODO: Implement command execution logic here
-  // For now, just return the command received
-  // Check if command has a value
-  // trust nothing, re-do all the sanitization.
-  // build up the command make sure we add "snapraid -c /path/to/snapraid.conf" to the front of the command.
-  res.json({ status: 'success', command });
+  executeCommand(state, buffer, req, res, broadcastSSE);
 });
 
 // ========= UI Hosting Server ======== //

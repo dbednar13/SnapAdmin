@@ -18,6 +18,7 @@
   "license": "GPL-3.0",
   "dependencies": {
     "circle-buffer": "^0.2.2",
+    "common": "workspace:*",
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "http-status-codes": "^2.3.0"

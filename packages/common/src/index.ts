@@ -1,2 +1,2 @@
 export * from './constants';
-export * from './utils/sanatizer';
+export * from './utils/sanitizer';
