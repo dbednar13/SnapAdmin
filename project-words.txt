@@ -10,6 +10,7 @@ smartctl
 smartmontools
 snapadmin
 snapraid
+softprops
 trivago
 undelete
 usbjmicron

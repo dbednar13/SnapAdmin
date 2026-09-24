@@ -1,11 +1,11 @@
 {
   "name": "backend",
-  "version": "0.1.12",
+  "version": "0.2.1",
   "description": "SnapAdmin Express Backend",
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "tsc",
+    "build": "tsc && node -e \"const fs=require('fs'); const path=require('path'); const src=path.resolve('config.yaml'); const dest=path.resolve('dist/config.yaml'); fs.copyFileSync(src, dest);\"",
     "start": "node dist/index.js",
     "format": "prettier --write .",
     "lint": "eslint ."
@@ -21,7 +21,8 @@
     "common": "workspace:*",
     "cors": "^2.8.6",
     "express": "^5.2.1",
-    "http-status-codes": "^2.3.0"
+    "http-status-codes": "^2.3.0",
+    "yaml": "^2.9.1"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
