@@ -67,7 +67,7 @@ jobs:
           VERSION="${{ steps.version.outputs.version }}"
           mkdir -p release
           cd packages/backend/dist
-          zip -r "../../release/SnapAdmin_${VERSION}.zip" .
+          zip -r "../../../release/SnapAdmin_${VERSION}.zip" .
 
       - name: Publish GitHub release
         uses: softprops/action-gh-release@v2
