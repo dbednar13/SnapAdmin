@@ -65,13 +65,13 @@ jobs:
         shell: bash
         run: |
           VERSION="${{ steps.version.outputs.version }}"
-          mkdir -p release
-          cd packages/backend/dist
-          zip -r "../../release/SnapAdmin_${VERSION}.zip" .
+          mkdir -p "$GITHUB_WORKSPACE/release"
+          cd "$GITHUB_WORKSPACE/packages/backend/dist"
+          zip -r "$GITHUB_WORKSPACE/release/SnapAdmin_${VERSION}.zip" .
 
       - name: Publish GitHub release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.version.outputs.tag }}
-          files: release/SnapAdmin_${{ steps.version.outputs.version }}.zip
+          files: $GITHUB_WORKSPACE/release/SnapAdmin_${{ steps.version.outputs.version }}.zip
           generate_release_notes: true
