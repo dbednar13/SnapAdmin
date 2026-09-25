@@ -17,6 +17,7 @@
       "@utils": ["./src/utilities"]
     }
   },
+  "references": [{ "path": "../common" }],
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
 }
