@@ -4,7 +4,7 @@ import { DEFAULT_SERVER_CONFIG, DEFAULT_SERVER_PORT } from '@constants';
 import { ServerConfig } from 'common';
 import YAML from 'yaml';
 
-const configFile = process.cwd() + './config.yaml';
+const configFile = process.cwd() + '/config.yaml';
 
 export const getConfigFile = (): ServerConfig => {
   if (!fs.existsSync(configFile)) {

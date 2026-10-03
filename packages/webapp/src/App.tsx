@@ -20,10 +20,10 @@ function App() {
             </div>
             <nav className="space-x-4 text-sm text-gray-600 dark:text-neutral-300">
               <button className="px-3 py-1 rounded hover:bg-gray-100 dark:hover:bg-neutral-700">
-                Link 1
+                Admin Config
               </button>
               <button className="px-3 py-1 rounded hover:bg-gray-100 dark:hover:bg-neutral-700">
-                Link 2
+                SnapRAID Config
               </button>
               <button className="px-3 py-1 rounded bg-indigo-600 text-white">
                 Command Center
@@ -33,6 +33,12 @@ function App() {
         </header>
 
         <main className="w-full px-4 py-6">
+          {
+            // TODO: Add routing for different sections (Admin Config, SnapRAID
+            // Config, Command Center)  Home is command center.  Anything that doesn't match
+            // a valid path should route to command center.
+            // This will be a single page app with no page reloads.
+          }
           <CommandCenter />
         </main>
       </div>
