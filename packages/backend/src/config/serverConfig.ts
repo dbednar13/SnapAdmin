@@ -1,25 +1,19 @@
 import * as fs from 'fs';
 
-import {
-  DEFAULT_CONFIG_PATH,
-  DEFAULT_EXECUTABLE_PATH,
-  DEFAULT_SERVER_CONFIG,
-  DEFAULT_SERVER_PORT,
-} from '@constants';
+import { DEFAULT_SERVER_CONFIG, DEFAULT_SERVER_PORT } from '@constants';
+import { ServerConfig } from 'common';
+import YAML from 'yaml';
 
-import { ServerConfig } from '../types/serverConfigTypes';
-
-const configFile = process.cwd() + '/config.json';
+const configFile = process.cwd() + './config.yaml';
 
 export const getConfigFile = (): ServerConfig => {
   if (!fs.existsSync(configFile)) {
-    fs.writeFileSync(configFile, JSON.stringify(DEFAULT_SERVER_CONFIG));
+    fs.writeFileSync(configFile, YAML.stringify(DEFAULT_SERVER_CONFIG));
     return DEFAULT_SERVER_CONFIG;
   }
 
-  const configDataRaw = fs.readFileSync(configFile, 'utf-8');
-
-  const configData = JSON.parse(configDataRaw);
+  const fileContent = fs.readFileSync(configFile, 'utf8');
+  const configData: ServerConfig = YAML.parse(fileContent);
 
   if (!configData.port) {
     configData.port = DEFAULT_SERVER_PORT;
@@ -28,17 +22,9 @@ export const getConfigFile = (): ServerConfig => {
     );
   }
 
-  if (!configData.configFilePath) {
-    configData.configFilePath = DEFAULT_CONFIG_PATH;
-    console.warn(
-      `Config file path not specified in config file. Using default path: ${DEFAULT_CONFIG_PATH}`
-    );
-  }
-
-  if (!configData.executablePath) {
-    configData.executablePath = DEFAULT_EXECUTABLE_PATH;
-    console.warn(
-      `Executable path not specified in config file. Using default path: ${DEFAULT_EXECUTABLE_PATH}`
+  if (!configData.snapRaidConfigPath) {
+    console.error(
+      `SnapRaid config file path not specified in config file.  Assuming file located next to executable.  Path will need to be provided before further configurations can be made.`
     );
   }
 
@@ -46,5 +32,5 @@ export const getConfigFile = (): ServerConfig => {
 };
 
 export const saveConfigFile = (config: ServerConfig): void => {
-  fs.writeFileSync(configFile, JSON.stringify(config, null, 2));
+  fs.writeFileSync(configFile, YAML.stringify(config));
 };
