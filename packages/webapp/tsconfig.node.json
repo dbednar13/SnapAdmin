@@ -2,7 +2,9 @@
   "compilerOptions": {
     "paths": {
       "@constants": ["./src/constants"],
-      "@constants/*": ["./src/constants/*"]
+      "@constants/*": ["./src/constants/*"],
+      "@components": ["./src/components"],
+      "@components/*": ["./src/components/*"]
     },
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
     "target": "ES2023",
