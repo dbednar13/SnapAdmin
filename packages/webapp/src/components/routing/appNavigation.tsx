@@ -1,7 +1,7 @@
 import { NavLink, useLocation } from 'react-router';
 
 const navigationItems = [
-  { to: '/admin-config', label: 'Admin Config' },
+  { to: '/admin-config', label: 'Settings' },
   { to: '/snapraid-config', label: 'SnapRAID Config' },
   { to: '/command-center', label: 'Command Center' },
 ];
