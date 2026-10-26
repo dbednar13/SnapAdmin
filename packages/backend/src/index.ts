@@ -92,9 +92,9 @@ app.post('/api/config', (req: Request, res: Response) => {
 });
 
 // ========= UI Hosting Server ======== //
-app.use(express.static(path.join(__dirname, '../dist/webapp')));
+app.use(express.static(path.join(__dirname, './webapp')));
 app.get('/{*splat}', (req, res) => {
-  res.sendFile(path.join(__dirname, '../dist/webapp/index.html'));
+  res.sendFile(path.join(__dirname, './webapp/index.html'));
 });
 
 // Start server
