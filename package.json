@@ -1,6 +1,6 @@
 {
   "name": "snapadmin",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "description": "Web based UI for SnapRaid",
   "private": true,
   "scripts": {
