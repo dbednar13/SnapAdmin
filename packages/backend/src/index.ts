@@ -1,21 +1,17 @@
 import { ChildProcessWithoutNullStreams } from 'child_process';
-import fs from 'fs';
 import path from 'path';
 
 import { CircularBuffer } from 'circle-buffer';
-import type { Config } from 'common';
 import cors from 'cors';
 import express, { Request, Response } from 'express';
-import YAML from 'yaml';
 
 import { executeCommand } from './actions';
 import { postTest, stopTest } from './actions/test';
-
-const fileContent = fs.readFileSync('./config.yaml', 'utf8');
-const config: Config = YAML.parse(fileContent);
+import { getConfigFile, saveConfigFile } from './config/serverConfig';
 
 const app = express();
-const PORT = config.Port || 9153;
+
+const config = getConfigFile();
 
 const state: {
   child: ChildProcessWithoutNullStreams | undefined;
@@ -85,6 +81,16 @@ app.post('/api/execute', (req: Request, res: Response) => {
   executeCommand(state, buffer, req, res, broadcastSSE);
 });
 
+app.get('/api/config', (req: Request, res: Response) => {
+  res.json(getConfigFile());
+});
+
+app.post('/api/config', (req: Request, res: Response) => {
+  const newConfig = req.body;
+  saveConfigFile(newConfig);
+  res.json({ message: 'Config updated successfully' });
+});
+
 // ========= UI Hosting Server ======== //
 app.use(express.static(path.join(__dirname, '../dist/webapp')));
 app.get('/{*splat}', (req, res) => {
@@ -92,11 +98,11 @@ app.get('/{*splat}', (req, res) => {
 });
 
 // Start server
-const server = app.listen(PORT, () => {
-  console.log(`🚀 Backend server running on http://localhost:${PORT}`);
+const server = app.listen(config.port, () => {
+  console.log(`🚀 Server running on http://localhost:${config.port}`);
 });
 
 server.on('error', (err) => {
-  console.error(`❌ Failed to start backend server on port ${PORT}:`, err);
+  console.error(`❌ Failed to start server on port ${config.port}:`, err);
   process.exit(1);
 });

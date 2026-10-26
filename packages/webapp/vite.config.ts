@@ -12,6 +12,9 @@ export default defineConfig({
   resolve: {
     alias: {
       '@constants': fileURLToPath(new URL('./src/constants', import.meta.url)),
+      '@components': fileURLToPath(
+        new URL('./src/components', import.meta.url)
+      ),
     },
   },
   server: {

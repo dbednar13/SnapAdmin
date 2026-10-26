@@ -6,7 +6,7 @@ Web based UI for SnapRaid. Inspired and influenced heavily by [Elucidate](https:
 
 This is a PNPM monorepo containing two packages:
 
-- **backend** - TypeScript Express web server (port 3000)
+- **backend** - TypeScript Express web server (port 9153)
 - **webapp** - Vite + React + TypeScript frontend (port 5173)
 
 ## Prerequisites
@@ -63,7 +63,7 @@ pnpm webapp:build
 ### Backend (`packages/backend`)
 
 - Express server with TypeScript
-- Runs on http://localhost:3000
+- Runs on http://localhost:9153
 - API endpoints:
   - `GET /` - Welcome message
   - `GET /api/health` - Health check

@@ -1,3 +1,4 @@
-export type Config = {
-  Port: number;
+export type ServerConfig = {
+  port: number;
+  snapRaidConfigPath: string | undefined;
 };

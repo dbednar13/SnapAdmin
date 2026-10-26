@@ -1,6 +1,6 @@
 {
   "name": "backend",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "SnapAdmin Express Backend",
   "main": "dist/index.js",
   "scripts": {
@@ -20,7 +20,7 @@
     "circle-buffer": "^0.2.2",
     "common": "workspace:*",
     "cors": "^2.8.6",
-    "express": "^5.2.1",
+    "express": "^5.3.0",
     "http-status-codes": "^2.3.0",
     "yaml": "^2.9.1"
   },
@@ -29,12 +29,12 @@
     "@trivago/prettier-plugin-sort-imports": "^6.0.2",
     "@types/cors": "^2.8.17",
     "@types/express": "^5.0.6",
-    "@types/node": "^26.1.2",
-    "eslint": "^10.8.0",
+    "@types/node": "^26.6.5",
+    "eslint": "^10.13.0",
     "eslint-config-prettier": "^10.1.8",
-    "prettier": "^3.9.6",
-    "tsx": "^4.23.1",
+    "prettier": "^3.9.10",
+    "tsx": "^4.23.15",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.65.0"
+    "typescript-eslint": "^8.72.0"
   }
 }

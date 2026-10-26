@@ -1,6 +1,6 @@
 {
   "name": "common",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "Shared SnapAdmin utilities and command definitions",
   "type": "module",
   "main": "./dist/index.js",
@@ -28,12 +28,12 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@trivago/prettier-plugin-sort-imports": "^6.0.2",
-    "@types/node": "^26.1.2",
-    "eslint": "^10.8.0",
+    "@types/node": "^26.6.5",
+    "eslint": "^10.13.0",
     "eslint-config-prettier": "^10.1.8",
-    "prettier": "^3.9.6",
-    "tsx": "^4.23.1",
+    "prettier": "^3.9.10",
+    "tsx": "^4.23.15",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.65.0"
+    "typescript-eslint": "^8.72.0"
   }
 }

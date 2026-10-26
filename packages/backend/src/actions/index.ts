@@ -4,6 +4,8 @@ import { CircularBuffer } from 'circle-buffer';
 import { sanitizeCommandInput } from 'common';
 import { Request, Response } from 'express';
 
+import { getConfigFile } from '../config/serverConfig';
+
 export function executeCommand(
   state: {
     child: ChildProcessWithoutNullStreams | undefined;
@@ -47,8 +49,11 @@ export function executeCommand(
     });
   }
 
-  //const configPath = sanitizeValue('/etc/snapraid.conf');
   const args = [...normalizedCommand.split(/\s+/)];
+  const configPath = getConfigFile().snapRaidConfigPath;
+  if (configPath) {
+    args.push('-c', configPath);
+  }
 
   try {
     state.child = spawn('snapraid', args, {
