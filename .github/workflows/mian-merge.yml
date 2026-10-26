@@ -67,6 +67,8 @@ jobs:
           VERSION="${{ steps.version.outputs.version }}"
           mkdir -p release
           pnpm --filter backend deploy --prod release/package
+          rm -rf release/package/node_modules
+          pnpm --dir release/package install --prod --frozen-lockfile --node-linker=hoisted
           cp -a release/package/node_modules release/package/dist/
           cd release/package/dist
           zip -r "../../SnapAdmin_${VERSION}.zip" .
