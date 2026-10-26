@@ -7,6 +7,11 @@ import express, { Request, Response } from 'express';
 
 import { executeCommand } from './actions';
 import { postTest, stopTest } from './actions/test';
+import {
+  ConfigFileOperationError,
+  readConfigFile,
+  writeConfigFile,
+} from './config';
 import { getConfigFile, saveConfigFile } from './config/serverConfig';
 
 const app = express();
@@ -89,6 +94,29 @@ app.post('/api/config', (req: Request, res: Response) => {
   const newConfig = req.body;
   saveConfigFile(newConfig);
   res.json({ message: 'Config updated successfully' });
+});
+
+app.get('/api/snapConfig', (req: Request, res: Response) => {
+  try {
+    return res.json(readConfigFile());
+  } catch (error) {
+    if (error instanceof ConfigFileOperationError) {
+      return res.status(error.statusCode).json({ message: error.message });
+    }
+    return res.status(500).json({ message: 'Failed to read SnapRAID config.' });
+  }
+});
+
+app.post('/api/snapConfig', (req: Request, res: Response) => {
+  try {
+    writeConfigFile(req.body);
+    return res.json({ message: 'SnapRAID config updated successfully.' });
+  } catch (error) {
+    if (error instanceof ConfigFileOperationError) {
+      return res.status(error.statusCode).json({ message: error.message });
+    }
+    return res.status(500).json({ message: 'Failed to write SnapRAID config.' });
+  }
 });
 
 // ========= UI Hosting Server ======== //
