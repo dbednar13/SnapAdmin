@@ -1,7 +1,13 @@
 /*
  * Code for configuration file related operations.
  */
-import { ConfigFileHelper, SnapShotSource } from './configFileHelper.js';
+import fs from 'fs';
+
+import {
+  ConfigFileHelper,
+  SnapRaidConfig,
+  SnapShotSource,
+} from './configFileHelper.js';
 import { getConfigFile } from './serverConfig.js';
 
 export class ConfigFileOperationError extends Error {
@@ -13,13 +19,13 @@ export class ConfigFileOperationError extends Error {
   }
 }
 
-export function readConfigFile() {
+export function readConfigFile(): SnapRaidConfig {
   const configPath = getConfigFile().snapRaidConfigPath;
   if (!configPath) {
     throw new ConfigFileOperationError('SnapRAID config path is not set.', 400);
   }
 
-  const config = new ConfigFileHelper(configPath);
+  const config = new ConfigFileHelper();
   if (!config.configFileExists) {
     throw new ConfigFileOperationError(
       'SnapRAID config file was not found.',
@@ -27,30 +33,7 @@ export function readConfigFile() {
     );
   }
 
-  return {
-    parityFile1: config.parityFile1,
-    parityFile2: config.parityFile2,
-    zParityFile: config.zParityFile,
-    parityFile3: config.parityFile3,
-    parityFile4: config.parityFile4,
-    parityFile5: config.parityFile5,
-    parityFile6: config.parityFile6,
-    contentFiles: config.contentFiles,
-    snapShotSources: config.snapShotSources,
-    excludePatterns: config.excludePatterns,
-    includePatterns: config.includePatterns,
-    extras: config.extras,
-    tempLimits: config.tempLimits,
-    tempSleeps: config.tempSleeps,
-    pools: config.pools,
-    shares: config.shares,
-    smartctlCommands: config.smartctlCommands,
-    blockSizeKB: config.blockSizeKB,
-    autoSaveGB: config.autoSaveGB,
-    nohidden: config.nohidden,
-    configErrors: config.configErrors,
-    configWarnings: config.configWarnings,
-  };
+  return config.getSnapRaidConfig();
 }
 
 export function writeConfigFile(input: unknown): void {
@@ -64,11 +47,10 @@ export function writeConfigFile(input: unknown): void {
   }
 
   const updates = input as Record<string, unknown>;
-  const config = new ConfigFileHelper(configPath);
+  const config = new ConfigFileHelper();
   const stringFields = [
     'parityFile1',
     'parityFile2',
-    'zParityFile',
     'parityFile3',
     'parityFile4',
     'parityFile5',
@@ -153,6 +135,28 @@ export function writeConfigFile(input: unknown): void {
       throw new ConfigFileOperationError('nohidden must be a boolean.', 400);
     }
     config.nohidden = updates.nohidden;
+  }
+
+  if (fs.existsSync(configPath)) {
+    const now = new Date();
+    const timestamp = [
+      now.getFullYear().toString().padStart(4, '0'),
+      (now.getMonth() + 1).toString().padStart(2, '0'),
+      now.getDate().toString().padStart(2, '0'),
+      now.getHours().toString().padStart(2, '0'),
+      now.getMinutes().toString().padStart(2, '0'),
+    ].join('');
+
+    try {
+      fs.copyFileSync(configPath, `${configPath}.${timestamp}`);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Unknown backup error';
+      throw new ConfigFileOperationError(
+        `Failed to back up SnapRAID config: ${message}`,
+        500
+      );
+    }
   }
 
   const writeError = config.write(configPath);
