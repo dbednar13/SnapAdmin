@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "pnpm --parallel --stream -r dev",
     "build": "pnpm -r build",
+    "package:release": "node scripts/package-release.mjs",
     "backend:dev": "pnpm --filter backend dev",
     "webapp:dev": "pnpm --filter webapp dev",
     "backend:build": "pnpm --filter backend build",

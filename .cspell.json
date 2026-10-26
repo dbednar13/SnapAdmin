@@ -9,6 +9,7 @@
   ],
   "dictionaries": ["project-words"],
   "ignorePaths": [
+    ".gitignore",
     "node_modules",
     "copilot-converted",
     "/project-words.txt",
