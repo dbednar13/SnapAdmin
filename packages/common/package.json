@@ -1,6 +1,6 @@
 {
   "name": "common",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "description": "Shared SnapAdmin utilities and command definitions",
   "type": "module",
   "main": "./dist/index.js",
