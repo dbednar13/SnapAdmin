@@ -6,7 +6,7 @@ import fs from 'fs';
 import {
   ConfigFileHelper,
   SnapRaidConfig,
-  SnapShotSource,
+  SnapRaidConfigWithValidation,
 } from './configFileHelper.js';
 import { getConfigFile } from './serverConfig.js';
 
@@ -19,123 +19,98 @@ export class ConfigFileOperationError extends Error {
   }
 }
 
-export function readConfigFile(): SnapRaidConfig {
-  const configPath = getConfigFile().snapRaidConfigPath;
-  if (!configPath) {
-    throw new ConfigFileOperationError('SnapRAID config path is not set.', 400);
+const isSnapRaidConfig = (value: unknown): value is SnapRaidConfig => {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+    return false;
   }
 
-  const config = new ConfigFileHelper();
-  if (!config.configFileExists) {
-    throw new ConfigFileOperationError(
-      'SnapRAID config file was not found.',
-      404
+  const config = value as Record<string, unknown>;
+  const isStringArray = (items: unknown): items is string[] =>
+    Array.isArray(items) && items.every((item) => typeof item === 'string');
+  const isSnapshotSourceArray = (items: unknown): boolean =>
+    Array.isArray(items) &&
+    items.every(
+      (source) =>
+        typeof source === 'object' &&
+        source !== null &&
+        typeof source.name === 'string' &&
+        typeof source.dirSource === 'string'
     );
-  }
 
+  return (
+    typeof config.parityFile1 === 'string' &&
+    [
+      'parityFile2',
+      'parityFile3',
+      'parityFile4',
+      'parityFile5',
+      'parityFile6',
+    ].every(
+      (field) =>
+        config[field] === undefined || typeof config[field] === 'string'
+    ) &&
+    isStringArray(config.contentFiles) &&
+    isSnapshotSourceArray(config.snapShotSources) &&
+    isStringArray(config.excludePatterns) &&
+    isStringArray(config.includePatterns) &&
+    typeof config.blockSizeKB === 'number' &&
+    Number.isFinite(config.blockSizeKB) &&
+    typeof config.autoSaveGB === 'number' &&
+    Number.isFinite(config.autoSaveGB) &&
+    typeof config.nohidden === 'boolean'
+  );
+};
+
+export function readConfigFile(): SnapRaidConfigWithValidation {
+  const config = new ConfigFileHelper();
+  config.read();
   return config.getSnapRaidConfig();
 }
 
-export function writeConfigFile(input: unknown): void {
+export function writeConfigFile(input: SnapRaidConfig): void {
   const configPath = getConfigFile().snapRaidConfigPath;
   if (!configPath) {
     throw new ConfigFileOperationError('SnapRAID config path is not set.', 400);
   }
 
-  if (typeof input !== 'object' || input === null || Array.isArray(input)) {
-    throw new ConfigFileOperationError('A config object is required.', 400);
-  }
-
-  const updates = input as Record<string, unknown>;
-  const config = new ConfigFileHelper();
-  const stringFields = [
-    'parityFile1',
-    'parityFile2',
-    'parityFile3',
-    'parityFile4',
-    'parityFile5',
-    'parityFile6',
-  ] as const;
-
-  for (const field of stringFields) {
-    if (field in updates) {
-      if (typeof updates[field] !== 'string') {
-        throw new ConfigFileOperationError(`${field} must be a string.`, 400);
-      }
-      config[field] = updates[field] as string;
-    }
-  }
-
-  const stringArrayFields = [
-    ['contentFiles', config.contentFiles],
-    ['excludePatterns', config.excludePatterns],
-    ['includePatterns', config.includePatterns],
-    ['extras', config.extras],
-    ['tempLimits', config.tempLimits],
-    ['tempSleeps', config.tempSleeps],
-    ['pools', config.pools],
-    ['shares', config.shares],
-    ['smartctlCommands', config.smartctlCommands],
-  ] as const;
-
-  for (const [field, target] of stringArrayFields) {
-    if (field in updates) {
-      const value = updates[field];
-      if (
-        !Array.isArray(value) ||
-        !value.every((item) => typeof item === 'string')
-      ) {
-        throw new ConfigFileOperationError(
-          `${field} must be an array of strings.`,
-          400
-        );
-      }
-      target.splice(0, target.length, ...value);
-    }
-  }
-
-  if ('snapShotSources' in updates) {
-    const sources = updates.snapShotSources;
-    if (
-      !Array.isArray(sources) ||
-      !sources.every(
-        (source) =>
-          typeof source === 'object' &&
-          source !== null &&
-          typeof source.name === 'string' &&
-          typeof source.dirSource === 'string'
-      )
-    ) {
-      throw new ConfigFileOperationError(
-        'snapShotSources must contain name and dirSource strings.',
-        400
-      );
-    }
-    config.snapShotSources.splice(
-      0,
-      config.snapShotSources.length,
-      ...(sources as SnapShotSource[])
+  if (!isSnapRaidConfig(input)) {
+    throw new ConfigFileOperationError(
+      'Request body must match the SnapRaidConfig shape.',
+      400
     );
   }
 
-  for (const field of ['blockSizeKB', 'autoSaveGB'] as const) {
-    if (field in updates) {
-      if (
-        typeof updates[field] !== 'number' ||
-        !Number.isFinite(updates[field])
-      ) {
-        throw new ConfigFileOperationError(`${field} must be a number.`, 400);
-      }
-      config[field] = updates[field] as number;
-    }
-  }
-
-  if ('nohidden' in updates) {
-    if (typeof updates.nohidden !== 'boolean') {
-      throw new ConfigFileOperationError('nohidden must be a boolean.', 400);
-    }
-    config.nohidden = updates.nohidden;
-  }
+  const config = new ConfigFileHelper();
+  config.read();
+  config.parityFile1 = input.parityFile1;
+  config.parityFile2 = input.parityFile2;
+  config.parityFile3 = input.parityFile3;
+  config.parityFile4 = input.parityFile4;
+  config.parityFile5 = input.parityFile5;
+  config.parityFile6 = input.parityFile6;
+  config.contentFiles.splice(
+    0,
+    config.contentFiles.length,
+    ...input.contentFiles
+  );
+  config.snapShotSources.splice(
+    0,
+    config.snapShotSources.length,
+    ...input.snapShotSources
+  );
+  config.excludePatterns.splice(
+    0,
+    config.excludePatterns.length,
+    ...input.excludePatterns
+  );
+  config.includePatterns.splice(
+    0,
+    config.includePatterns.length,
+    ...input.includePatterns
+  );
+  config.blockSizeKB = input.blockSizeKB;
+  config.autoSaveGB = input.autoSaveGB;
+  config.nohidden = input.nohidden;
 
   if (fs.existsSync(configPath)) {
     const now = new Date();

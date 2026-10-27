@@ -40,11 +40,11 @@ export interface SnapShotSource {
 
 export interface SnapRaidConfig {
   parityFile1: string;
-  parityFile2: string | undefined;
-  parityFile3: string | undefined;
-  parityFile4: string | undefined;
-  parityFile5: string | undefined;
-  parityFile6: string | undefined;
+  parityFile2?: string;
+  parityFile3?: string;
+  parityFile4?: string;
+  parityFile5?: string;
+  parityFile6?: string;
   readonly contentFiles: string[];
   readonly snapShotSources: SnapShotSource[];
   readonly excludePatterns: string[];
@@ -52,6 +52,11 @@ export interface SnapRaidConfig {
   blockSizeKB: number;
   autoSaveGB: number;
   nohidden: boolean;
+}
+
+export interface SnapRaidConfigWithValidation extends SnapRaidConfig {
+  configErrors: string[];
+  configWarnings: string[];
 }
 
 const VALID_CONFIG_NAMES = new Set([
@@ -77,7 +82,7 @@ const VALID_CONFIG_NAMES = new Set([
   'smartctl',
 ]);
 
-export class ConfigFileHelper implements SnapRaidConfig {
+export class ConfigFileHelper implements SnapRaidConfigWithValidation {
   public static readonly CHECKBOX_DISPLAY_OUTPUT_ENABLED = 0;
   public static readonly CHECKBOX_USE_VERBOSE_MODE = 1;
   public static readonly CHECKBOX_FIND_BY_NAME_IN_SYNC = 2;
@@ -153,7 +158,7 @@ export class ConfigFileHelper implements SnapRaidConfig {
     return [...this.snapShotSources];
   }
 
-  public getSnapRaidConfig(): SnapRaidConfig {
+  public getSnapRaidConfig(): SnapRaidConfigWithValidation {
     return {
       parityFile1: this.parityFile1,
       parityFile2: this.parityFile2,
@@ -168,6 +173,8 @@ export class ConfigFileHelper implements SnapRaidConfig {
       blockSizeKB: this.blockSizeKB,
       autoSaveGB: this.autoSaveGB,
       nohidden: this.nohidden,
+      configErrors: this.configErrors,
+      configWarnings: this.configWarnings,
     };
   }
 
@@ -181,50 +188,46 @@ export class ConfigFileHelper implements SnapRaidConfig {
     return true;
   }
 
-  public loadConfigFile(configFile: string): void {
-    this.configErrors.length = 0;
-    this.configWarnings.length = 0;
-    this.configPath = configFile;
-
-    if (this.read()) {
-      this.doValidation();
-      return;
-    }
-
-    this.configErrors.push(
-      `Failed to read the configuration file ${configFile}`
-    );
-  }
-
   public read(): boolean {
     const configPath = getConfigFile().snapRaidConfigPath;
 
+    this.configErrors.length = 0;
+    this.configWarnings.length = 0;
+    this.parityFile1 = '';
+    this.parityFile2 = undefined;
+    this.parityFile3 = undefined;
+    this.parityFile4 = undefined;
+    this.parityFile5 = undefined;
+    this.parityFile6 = undefined;
+    this.contentFiles.length = 0;
+    this.snapShotSources.length = 0;
+    this.excludePatterns.length = 0;
+    this.includePatterns.length = 0;
+    this.extras.length = 0;
+    this.tempLimits.length = 0;
+    this.tempSleeps.length = 0;
+    this.pools.length = 0;
+    this.shares.length = 0;
+    this.smartctlCommands.length = 0;
+    this.blockSizeKB = DEFAULT_BLOCK_SIZE;
+    this.autoSaveGB = DEFAULT_AUTO_SAVE;
+    this.nohidden = false;
+
+    if (!configPath) {
+      this.configErrors.push('SnapRAID config path is not set.');
+      return false;
+    }
+
+    if (!this.configFileExists(configPath)) {
+      this.configErrors.push(
+        `SnapRAID config file was not found: ${configPath}`
+      );
+      return false;
+    }
+
+    let isConfigRead = true;
+
     try {
-      if (!this.configFileExists(configPath) || !configPath) {
-        return false;
-      }
-
-      let isConfigRead = true;
-
-      this.parityFile1 = '';
-      this.parityFile2 = '';
-      this.parityFile3 = '';
-      this.parityFile4 = '';
-      this.parityFile5 = '';
-      this.parityFile6 = '';
-
-      this.configErrors.length = 0;
-      this.configWarnings.length = 0;
-
-      this.contentFiles.length = 0;
-      this.snapShotSources.length = 0;
-      this.excludePatterns.length = 0;
-      this.includePatterns.length = 0;
-
-      this.blockSizeKB = DEFAULT_BLOCK_SIZE;
-      this.autoSaveGB = DEFAULT_AUTO_SAVE;
-      this.nohidden = false;
-
       const lines = fs.readFileSync(configPath, 'utf8').split(/\r?\n/);
 
       for (const rawLine of lines) {
@@ -299,6 +302,9 @@ export class ConfigFileHelper implements SnapRaidConfig {
               this.blockSizeKB > MAX_BLOCK_SIZE
             ) {
               isConfigRead = false;
+              this.configErrors.push(
+                `block_size must be between ${MIN_BLOCK_SIZE} and ${MAX_BLOCK_SIZE}.`
+              );
             }
             break;
           }
@@ -310,6 +316,9 @@ export class ConfigFileHelper implements SnapRaidConfig {
               this.autoSaveGB > MAX_AUTO_SAVE
             ) {
               isConfigRead = false;
+              this.configErrors.push(
+                `autosave must be between ${MIN_AUTO_SAVE} and ${MAX_AUTO_SAVE}.`
+              );
             }
             break;
           }
@@ -338,11 +347,24 @@ export class ConfigFileHelper implements SnapRaidConfig {
             break;
         }
       }
-
-      return isConfigRead;
-    } catch {
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Unknown read error';
+      this.configErrors.push(
+        `Failed to read SnapRAID config file ${configPath}: ${message}`
+      );
       return false;
     }
+
+    try {
+      this.doValidation();
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Unknown validation error';
+      this.configErrors.push(`Failed to validate SnapRAID config: ${message}`);
+    }
+
+    return isConfigRead && this.configErrors.length === 0;
   }
 
   public getPathsOfInterest(): CoveragePath[] {
