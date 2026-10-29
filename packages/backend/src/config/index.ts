@@ -3,11 +3,9 @@
  */
 import fs from 'fs';
 
-import {
-  ConfigFileHelper,
-  SnapRaidConfig,
-  SnapRaidConfigWithValidation,
-} from './configFileHelper.js';
+import type { SnapRaidConfig, SnapRaidConfigWithValidation } from 'common';
+
+import { ConfigFileHelper } from './configFileHelper.js';
 import { getConfigFile } from './serverConfig.js';
 
 export class ConfigFileOperationError extends Error {

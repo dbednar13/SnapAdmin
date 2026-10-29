@@ -11,6 +11,7 @@ import {
   PathType,
 } from '@constants';
 import { CoveragePath, StorageProvider } from '@types';
+import type { SnapRaidConfigWithValidation, SnapShotSource } from 'common';
 
 import { BasicStorageProvider } from '../utilities';
 import {
@@ -32,32 +33,6 @@ import {
   TEMP_SLEEP_SECTION,
 } from './configSections.js';
 import { getConfigFile } from './serverConfig';
-
-export interface SnapShotSource {
-  name: string;
-  dirSource: string;
-}
-
-export interface SnapRaidConfig {
-  parityFile1: string;
-  parityFile2?: string;
-  parityFile3?: string;
-  parityFile4?: string;
-  parityFile5?: string;
-  parityFile6?: string;
-  readonly contentFiles: string[];
-  readonly snapShotSources: SnapShotSource[];
-  readonly excludePatterns: string[];
-  readonly includePatterns: string[];
-  blockSizeKB: number;
-  autoSaveGB: number;
-  nohidden: boolean;
-}
-
-export interface SnapRaidConfigWithValidation extends SnapRaidConfig {
-  configErrors: string[];
-  configWarnings: string[];
-}
 
 const VALID_CONFIG_NAMES = new Set([
   'parity',

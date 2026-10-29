@@ -18,7 +18,6 @@ export default function AdminConfig() {
   useBeforeUnload((event) => {
     if (isDirty) {
       event.preventDefault();
-      event.returnValue = '';
     }
   });
 
