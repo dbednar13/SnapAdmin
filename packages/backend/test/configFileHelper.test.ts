@@ -73,6 +73,12 @@ test('updates the configured copy and writes a timestamped backup', () => {
   const updatedConfig = {
     ...originalConfig,
     parityFile1: 'C:\\snapraid-updated.parity',
+    contentFiles: [
+      path.join(temporaryDirectory, 'content-1'),
+      path.join(temporaryDirectory, 'content-2'),
+      path.join(temporaryDirectory, 'content-3'),
+    ],
+    snapShotSources: [{ name: 'd1', dirSource: temporaryDirectory }],
     autoSaveGB: 2048,
     nohidden: true,
   };
@@ -130,4 +136,43 @@ test('updates the configured copy and writes a timestamped backup', () => {
   assert.match(writes[0]?.contents ?? '', /autosave 2048/);
   assert.match(writes[0]?.contents ?? '', /nohidden\n/);
   assert.match(writes[0]?.contents ?? '', /exclude \*\.covefs/);
+});
+
+test('returns validation errors without backing up or writing invalid input', () => {
+  const invalidConfig = {
+    ...configOperations.readConfigFile(),
+    blockSizeKB: 1,
+    contentFiles: [
+      path.join(temporaryDirectory, 'content-1'),
+      path.join(temporaryDirectory, 'content-2'),
+    ],
+    snapShotSources: [{ name: 'd1', dirSource: temporaryDirectory }],
+  };
+  const originalCopyFileSync = fs.copyFileSync;
+  const originalWriteFileSync = fs.writeFileSync;
+  let backupCalled = false;
+  let writeCalled = false;
+
+  fs.copyFileSync = (() => {
+    backupCalled = true;
+  }) as typeof fs.copyFileSync;
+  fs.writeFileSync = (() => {
+    writeCalled = true;
+  }) as typeof fs.writeFileSync;
+
+  try {
+    assert.throws(
+      () => configOperations.writeConfigFile(invalidConfig),
+      (error: unknown) =>
+        error instanceof configOperations.ConfigFileOperationError &&
+        error.statusCode === 400 &&
+        error.message.includes('block_size must be between')
+    );
+  } finally {
+    fs.copyFileSync = originalCopyFileSync;
+    fs.writeFileSync = originalWriteFileSync;
+  }
+
+  assert.equal(backupCalled, false);
+  assert.equal(writeCalled, false);
 });

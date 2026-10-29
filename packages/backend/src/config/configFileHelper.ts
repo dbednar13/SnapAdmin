@@ -225,8 +225,6 @@ export class ConfigFileHelper implements SnapRaidConfigWithValidation {
       return false;
     }
 
-    let isConfigRead = true;
-
     try {
       const lines = fs.readFileSync(configPath, 'utf8').split(/\r?\n/);
 
@@ -297,29 +295,11 @@ export class ConfigFileHelper implements SnapRaidConfigWithValidation {
           case 'block_size': {
             const parsed = Number.parseInt(configItemValue, 10);
             this.blockSizeKB = Number.isNaN(parsed) ? this.blockSizeKB : parsed;
-            if (
-              this.blockSizeKB < MIN_BLOCK_SIZE ||
-              this.blockSizeKB > MAX_BLOCK_SIZE
-            ) {
-              isConfigRead = false;
-              this.configErrors.push(
-                `block_size must be between ${MIN_BLOCK_SIZE} and ${MAX_BLOCK_SIZE}.`
-              );
-            }
             break;
           }
           case 'autosave': {
             const parsed = Number.parseInt(configItemValue, 10);
             this.autoSaveGB = Number.isNaN(parsed) ? this.autoSaveGB : parsed;
-            if (
-              this.autoSaveGB < MIN_AUTO_SAVE ||
-              this.autoSaveGB > MAX_AUTO_SAVE
-            ) {
-              isConfigRead = false;
-              this.configErrors.push(
-                `autosave must be between ${MIN_AUTO_SAVE} and ${MAX_AUTO_SAVE}.`
-              );
-            }
             break;
           }
           case 'nohidden':
@@ -356,6 +336,13 @@ export class ConfigFileHelper implements SnapRaidConfigWithValidation {
       return false;
     }
 
+    return this.validate().length === 0;
+  }
+
+  public validate(): string[] {
+    this.configErrors.length = 0;
+    this.configWarnings.length = 0;
+
     try {
       this.doValidation();
     } catch (error) {
@@ -364,7 +351,7 @@ export class ConfigFileHelper implements SnapRaidConfigWithValidation {
       this.configErrors.push(`Failed to validate SnapRAID config: ${message}`);
     }
 
-    return isConfigRead && this.configErrors.length === 0;
+    return this.configErrors;
   }
 
   public getPathsOfInterest(): CoveragePath[] {
@@ -594,15 +581,18 @@ export class ConfigFileHelper implements SnapRaidConfigWithValidation {
       );
     }
 
-    if (this.blockSizeKB < 1 || this.blockSizeKB > MAX_BLOCK_SIZE) {
+    if (
+      this.blockSizeKB < MIN_BLOCK_SIZE ||
+      this.blockSizeKB > MAX_BLOCK_SIZE
+    ) {
       this.configErrors.push(
-        'The blockSize value is invalid and must be between 1 and 16384'
+        `block_size must be between ${MIN_BLOCK_SIZE} and ${MAX_BLOCK_SIZE}.`
       );
     }
 
-    if (this.autoSaveGB > MAX_AUTO_SAVE) {
+    if (this.autoSaveGB < MIN_AUTO_SAVE || this.autoSaveGB > MAX_AUTO_SAVE) {
       this.configErrors.push(
-        `The autoSave value is invalid and must be between ${MIN_AUTO_SAVE} and ${MAX_AUTO_SAVE}`
+        `autosave must be between ${MIN_AUTO_SAVE} and ${MAX_AUTO_SAVE}.`
       );
     }
   }

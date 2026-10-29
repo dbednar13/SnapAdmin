@@ -112,6 +112,14 @@ export function writeConfigFile(input: SnapRaidConfig): void {
   config.autoSaveGB = input.autoSaveGB;
   config.nohidden = input.nohidden;
 
+  const validationErrors = config.validate();
+  if (validationErrors.length > 0) {
+    throw new ConfigFileOperationError(
+      `Invalid SnapRAID config: ${validationErrors.join(' ')}`,
+      400
+    );
+  }
+
   if (fs.existsSync(configPath)) {
     const now = new Date();
     const timestamp = [
