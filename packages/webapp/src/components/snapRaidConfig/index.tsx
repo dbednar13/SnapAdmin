@@ -2,22 +2,11 @@ import type { SnapRaidConfig, SnapRaidConfigWithValidation } from 'common';
 import { type SubmitEvent, useEffect, useState } from 'react';
 import { Link, useBeforeUnload, useBlocker, useNavigate } from 'react-router';
 
-type ParityField =
-  | 'parityFile1'
-  | 'parityFile2'
-  | 'parityFile3'
-  | 'parityFile4'
-  | 'parityFile5'
-  | 'parityFile6';
-
-const parityFields: { name: ParityField; label: string }[] = [
-  { name: 'parityFile1', label: 'Parity file' },
-  { name: 'parityFile2', label: '2-parity file' },
-  { name: 'parityFile3', label: '3-parity file' },
-  { name: 'parityFile4', label: '4-parity file' },
-  { name: 'parityFile5', label: '5-parity file' },
-  { name: 'parityFile6', label: '6-parity file' },
-];
+import Content from './content';
+import DataSources from './dataSources';
+import GeneralSettings from './generalSettings';
+import Parity from './parity';
+import Patterns from './patterns';
 
 const toEditableConfig = (
   result: SnapRaidConfigWithValidation
@@ -36,12 +25,6 @@ const toEditableConfig = (
   autoSaveGB: result.autoSaveGB,
   nohidden: result.nohidden,
 });
-
-const parseLines = (value: string): string[] =>
-  value
-    .split(/\r?\n/)
-    .map((item) => item.trim())
-    .filter(Boolean);
 
 export default function SnapRaidConfigPage() {
   const navigate = useNavigate();
@@ -248,230 +231,16 @@ export default function SnapRaidConfigPage() {
 
           {!missingConfigPath && config && (
             <form onSubmit={handleSubmit} className="space-y-6">
-              <fieldset className="space-y-4 border-b border-gray-200 pb-6 dark:border-neutral-700">
-                <legend className="mb-3 text-base font-semibold">
-                  Parity files
-                </legend>
-                <div className="grid gap-4 md:grid-cols-2">
-                  {parityFields.map(({ name, label }, index) => (
-                    <div key={name}>
-                      <label
-                        htmlFor={name}
-                        className="mb-1 block text-sm font-medium"
-                      >
-                        {label}
-                        {index === 0 ? ' (required)' : ''}
-                      </label>
-                      <input
-                        id={name}
-                        value={config[name] ?? ''}
-                        required={index === 0}
-                        onChange={(event) =>
-                          updateConfig(name, event.target.value)
-                        }
-                        className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-sm dark:border-neutral-600 dark:bg-neutral-800"
-                      />
-                    </div>
-                  ))}
-                </div>
-              </fieldset>
+              <Parity config={config} updateConfig={updateConfig} />
 
               <div className="grid gap-6 md:grid-cols-2">
-                <div>
-                  <label
-                    htmlFor="content-files"
-                    className="mb-1 block text-sm font-semibold"
-                  >
-                    Content files
-                  </label>
-                  <textarea
-                    id="content-files"
-                    rows={5}
-                    value={config.contentFiles.join('\n')}
-                    onChange={(event) =>
-                      updateConfig(
-                        'contentFiles',
-                        parseLines(event.target.value)
-                      )
-                    }
-                    className="w-full rounded border border-gray-300 bg-white px-3 py-2 font-mono text-sm dark:border-neutral-600 dark:bg-neutral-800"
-                  />
-                </div>
-                <div>
-                  <div className="mb-2 flex items-center justify-between">
-                    <h2 className="text-sm font-semibold">Data sources</h2>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        updateConfig('snapShotSources', [
-                          ...config.snapShotSources,
-                          {
-                            name: `d${config.snapShotSources.length + 1}`,
-                            dirSource: '',
-                          },
-                        ])
-                      }
-                      className="rounded border border-gray-300 px-3 py-1 text-sm hover:bg-gray-100 dark:border-neutral-600 dark:hover:bg-neutral-800"
-                    >
-                      Add source
-                    </button>
-                  </div>
-                  <div className="mb-1 grid grid-cols-[minmax(4rem,0.3fr)_minmax(0,1fr)_auto] gap-2 text-xs font-medium text-gray-600 dark:text-neutral-400">
-                    <span>Disk</span>
-                    <span>Directory</span>
-                    <span className="sr-only">Actions</span>
-                  </div>
-                  <div className="space-y-2">
-                    {config.snapShotSources.map((source, index) => (
-                      <div
-                        key={`${source.name}-${index}`}
-                        className="grid grid-cols-[minmax(4rem,0.3fr)_minmax(0,1fr)_auto] gap-2"
-                      >
-                        <input
-                          aria-label={`Data source ${index + 1} name`}
-                          value={source.name}
-                          onChange={(event) => {
-                            const sources = [...config.snapShotSources];
-                            sources[index] = {
-                              ...source,
-                              name: event.target.value,
-                            };
-                            updateConfig('snapShotSources', sources);
-                          }}
-                          className="min-w-0 rounded border border-gray-300 bg-white px-2 py-2 text-sm dark:border-neutral-600 dark:bg-neutral-800"
-                        />
-                        <input
-                          aria-label={`Data source ${index + 1} path`}
-                          value={source.dirSource}
-                          onChange={(event) => {
-                            const sources = [...config.snapShotSources];
-                            sources[index] = {
-                              ...source,
-                              dirSource: event.target.value,
-                            };
-                            updateConfig('snapShotSources', sources);
-                          }}
-                          className="min-w-0 rounded border border-gray-300 bg-white px-2 py-2 text-sm dark:border-neutral-600 dark:bg-neutral-800"
-                        />
-                        <button
-                          type="button"
-                          aria-label={`Remove data source ${index + 1}`}
-                          title="Remove source"
-                          onClick={() =>
-                            updateConfig(
-                              'snapShotSources',
-                              config.snapShotSources.filter(
-                                (_, itemIndex) => itemIndex !== index
-                              )
-                            )
-                          }
-                          className="rounded border border-gray-300 px-3 text-sm hover:bg-gray-100 dark:border-neutral-600 dark:hover:bg-neutral-800"
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                <Content config={config} updateConfig={updateConfig} />
+                <DataSources config={config} updateConfig={updateConfig} />
               </div>
 
-              <div className="grid gap-6 md:grid-cols-2">
-                <div>
-                  <label
-                    htmlFor="exclude-patterns"
-                    className="mb-1 block text-sm font-semibold"
-                  >
-                    Exclude patterns
-                  </label>
-                  <textarea
-                    id="exclude-patterns"
-                    rows={5}
-                    value={config.excludePatterns.join('\n')}
-                    onChange={(event) =>
-                      updateConfig(
-                        'excludePatterns',
-                        parseLines(event.target.value)
-                      )
-                    }
-                    className="w-full rounded border border-gray-300 bg-white px-3 py-2 font-mono text-sm dark:border-neutral-600 dark:bg-neutral-800"
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="include-patterns"
-                    className="mb-1 block text-sm font-semibold"
-                  >
-                    Include patterns
-                  </label>
-                  <textarea
-                    id="include-patterns"
-                    rows={5}
-                    value={config.includePatterns.join('\n')}
-                    onChange={(event) =>
-                      updateConfig(
-                        'includePatterns',
-                        parseLines(event.target.value)
-                      )
-                    }
-                    className="w-full rounded border border-gray-300 bg-white px-3 py-2 font-mono text-sm dark:border-neutral-600 dark:bg-neutral-800"
-                  />
-                </div>
-              </div>
+              <Patterns config={config} updateConfig={updateConfig} />
 
-              <fieldset className="grid gap-4 border-t border-gray-200 pt-5 md:grid-cols-3 dark:border-neutral-700">
-                <legend className="text-sm font-semibold">
-                  General settings
-                </legend>
-                <div>
-                  <label
-                    htmlFor="block-size"
-                    className="mb-1 block text-sm font-medium"
-                  >
-                    Block size (KB)
-                  </label>
-                  <input
-                    id="block-size"
-                    type="number"
-                    min={32}
-                    max={16384}
-                    value={config.blockSizeKB}
-                    onChange={(event) =>
-                      updateConfig('blockSizeKB', Number(event.target.value))
-                    }
-                    className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-sm dark:border-neutral-600 dark:bg-neutral-800"
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="auto-save"
-                    className="mb-1 block text-sm font-medium"
-                  >
-                    Autosave (GB)
-                  </label>
-                  <input
-                    id="auto-save"
-                    type="number"
-                    min={10}
-                    max={32767}
-                    value={config.autoSaveGB}
-                    onChange={(event) =>
-                      updateConfig('autoSaveGB', Number(event.target.value))
-                    }
-                    className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-sm dark:border-neutral-600 dark:bg-neutral-800"
-                  />
-                </div>
-                <label className="flex items-center gap-2 self-end pb-2 text-sm font-medium">
-                  <input
-                    type="checkbox"
-                    checked={config.nohidden}
-                    onChange={(event) =>
-                      updateConfig('nohidden', event.target.checked)
-                    }
-                    className="h-4 w-4 accent-indigo-600"
-                  />
-                  Exclude hidden files
-                </label>
-              </fieldset>
+              <GeneralSettings config={config} updateConfig={updateConfig} />
 
               <div className="flex justify-end border-t border-gray-200 pt-5 dark:border-neutral-700">
                 <button
