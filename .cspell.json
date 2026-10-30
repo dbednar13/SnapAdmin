@@ -19,6 +19,7 @@
     "pnpm-lock.yaml",
     "yarn.lock",
     "package.json",
-    "*.svg"
+    "*.svg",
+    "SnapRAID.conf"
   ]
 }

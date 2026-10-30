@@ -115,7 +115,9 @@ app.post('/api/snapConfig', (req: Request, res: Response) => {
     if (error instanceof ConfigFileOperationError) {
       return res.status(error.statusCode).json({ message: error.message });
     }
-    return res.status(500).json({ message: 'Failed to write SnapRAID config.' });
+    return res
+      .status(500)
+      .json({ message: 'Failed to write SnapRAID config.' });
   }
 });
 
