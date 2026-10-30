@@ -1,5 +1,6 @@
 arcmsr
 Avenir
+covefs
 elif
 esbuild
 hashsize

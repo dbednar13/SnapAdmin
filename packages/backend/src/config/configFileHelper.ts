@@ -11,6 +11,7 @@ import {
   PathType,
 } from '@constants';
 import { CoveragePath, StorageProvider } from '@types';
+import type { SnapRaidConfigWithValidation, SnapShotSource } from 'common';
 
 import { BasicStorageProvider } from '../utilities';
 import {
@@ -31,18 +32,12 @@ import {
   TEMP_LIMIT_SECTION,
   TEMP_SLEEP_SECTION,
 } from './configSections.js';
-
-export interface SnapShotSource {
-  name: string;
-  dirSource: string;
-}
+import { getConfigFile } from './serverConfig';
 
 const VALID_CONFIG_NAMES = new Set([
   'parity',
   '2-parity',
-  'q-parity',
   '3-parity',
-  'z-parity',
   '4-parity',
   '5-parity',
   '6-parity',
@@ -62,7 +57,7 @@ const VALID_CONFIG_NAMES = new Set([
   'smartctl',
 ]);
 
-export class ConfigFileHelper {
+export class ConfigFileHelper implements SnapRaidConfigWithValidation {
   public static readonly CHECKBOX_DISPLAY_OUTPUT_ENABLED = 0;
   public static readonly CHECKBOX_USE_VERBOSE_MODE = 1;
   public static readonly CHECKBOX_FIND_BY_NAME_IN_SYNC = 2;
@@ -71,23 +66,24 @@ export class ConfigFileHelper {
 
   private readonly storageProvider: StorageProvider;
 
-  private configPath: string | null = null;
-
   public configErrors: string[] = [];
   public configWarnings: string[] = [];
 
   public parityFile1 = '';
-  public parityFile2 = '';
-  public zParityFile = '';
-  public parityFile3 = '';
-  public parityFile4 = '';
-  public parityFile5 = '';
-  public parityFile6 = '';
+  public parityFile2: string | undefined = undefined;
+  public parityFile3: string | undefined = undefined;
+  public parityFile4: string | undefined = undefined;
+  public parityFile5: string | undefined = undefined;
+  public parityFile6: string | undefined = undefined;
 
   public readonly contentFiles: string[] = [];
   public readonly snapShotSources: SnapShotSource[] = [];
   public readonly excludePatterns: string[] = [];
   public readonly includePatterns: string[] = [];
+
+  public blockSizeKB = DEFAULT_BLOCK_SIZE;
+  public autoSaveGB = DEFAULT_AUTO_SAVE;
+  public nohidden = false;
 
   /*
    * The following properties are not currently supported
@@ -104,23 +100,17 @@ export class ConfigFileHelper {
    * End of currently not supported properties
    */
 
-  public blockSizeKB = DEFAULT_BLOCK_SIZE;
-  public autoSaveGB = DEFAULT_AUTO_SAVE;
-  public nohidden = false;
-
   public constructor(
-    configPath?: string,
     storageProvider: StorageProvider = new BasicStorageProvider()
   ) {
     this.storageProvider = storageProvider;
-
-    if (configPath) {
-      this.loadConfigFile(configPath);
-    }
   }
 
   public get isValid(): boolean {
-    return this.configFileExists && this.configErrors.length === 0;
+    return (
+      this.configFileExists(getConfigFile().snapRaidConfigPath) &&
+      this.configErrors.length === 0
+    );
   }
 
   public get hasErrors(): boolean {
@@ -131,12 +121,36 @@ export class ConfigFileHelper {
     return this.configWarnings.length > 0;
   }
 
-  public get configFileExists(): boolean {
-    return this.configPath !== null && fs.existsSync(this.configPath);
+  public configFileExists(configPath: string | null | undefined): boolean {
+    return (
+      configPath !== null &&
+      configPath !== undefined &&
+      fs.existsSync(configPath)
+    );
   }
 
   public get dataSourcePaths(): readonly SnapShotSource[] {
     return [...this.snapShotSources];
+  }
+
+  public getSnapRaidConfig(): SnapRaidConfigWithValidation {
+    return {
+      parityFile1: this.parityFile1,
+      parityFile2: this.parityFile2,
+      parityFile3: this.parityFile3,
+      parityFile4: this.parityFile4,
+      parityFile5: this.parityFile5,
+      parityFile6: this.parityFile6,
+      contentFiles: this.contentFiles,
+      snapShotSources: this.snapShotSources,
+      excludePatterns: this.excludePatterns,
+      includePatterns: this.includePatterns,
+      blockSizeKB: this.blockSizeKB,
+      autoSaveGB: this.autoSaveGB,
+      nohidden: this.nohidden,
+      configErrors: this.configErrors,
+      configWarnings: this.configWarnings,
+    };
   }
 
   public isNewSync(): boolean {
@@ -149,50 +163,45 @@ export class ConfigFileHelper {
     return true;
   }
 
-  public loadConfigFile(configFile: string): void {
+  public read(): boolean {
+    const configPath = getConfigFile().snapRaidConfigPath;
+
     this.configErrors.length = 0;
     this.configWarnings.length = 0;
-    this.configPath = configFile;
+    this.parityFile1 = '';
+    this.parityFile2 = undefined;
+    this.parityFile3 = undefined;
+    this.parityFile4 = undefined;
+    this.parityFile5 = undefined;
+    this.parityFile6 = undefined;
+    this.contentFiles.length = 0;
+    this.snapShotSources.length = 0;
+    this.excludePatterns.length = 0;
+    this.includePatterns.length = 0;
+    this.extras.length = 0;
+    this.tempLimits.length = 0;
+    this.tempSleeps.length = 0;
+    this.pools.length = 0;
+    this.shares.length = 0;
+    this.smartctlCommands.length = 0;
+    this.blockSizeKB = DEFAULT_BLOCK_SIZE;
+    this.autoSaveGB = DEFAULT_AUTO_SAVE;
+    this.nohidden = false;
 
-    if (this.read()) {
-      this.doValidation();
-      return;
+    if (!configPath) {
+      this.configErrors.push('SnapRAID config path is not set.');
+      return false;
     }
 
-    this.configErrors.push(
-      `Failed to read the configuration file ${configFile}`
-    );
-  }
+    if (!this.configFileExists(configPath)) {
+      this.configErrors.push(
+        `SnapRAID config file was not found: ${configPath}`
+      );
+      return false;
+    }
 
-  public read(): boolean {
     try {
-      if (!this.configFileExists || this.configPath === null) {
-        return false;
-      }
-
-      let isConfigRead = true;
-
-      this.parityFile1 = '';
-      this.parityFile2 = '';
-      this.zParityFile = '';
-      this.parityFile3 = '';
-      this.parityFile4 = '';
-      this.parityFile5 = '';
-      this.parityFile6 = '';
-
-      this.configErrors.length = 0;
-      this.configWarnings.length = 0;
-
-      this.contentFiles.length = 0;
-      this.snapShotSources.length = 0;
-      this.excludePatterns.length = 0;
-      this.includePatterns.length = 0;
-
-      this.blockSizeKB = DEFAULT_BLOCK_SIZE;
-      this.autoSaveGB = DEFAULT_AUTO_SAVE;
-      this.nohidden = false;
-
-      const lines = fs.readFileSync(this.configPath, 'utf8').split(/\r?\n/);
+      const lines = fs.readFileSync(configPath, 'utf8').split(/\r?\n/);
 
       for (const rawLine of lines) {
         const lineStart = rawLine.trim();
@@ -215,22 +224,13 @@ export class ConfigFileHelper {
           case 'parity':
             this.parityFile1 = configItemValue;
             break;
-          case 'q-parity':
-            this.parityFile2 = configItemValue;
-            break;
           case '2-parity':
             if (!this.parityFile2) {
               this.parityFile2 = configItemValue;
             }
             break;
-          case 'z-parity':
-            this.zParityFile = configItemValue;
-            this.parityFile3 = '';
-            break;
           case '3-parity':
-            if (!this.zParityFile.trim()) {
-              this.parityFile3 = configItemValue;
-            }
+            this.parityFile3 = configItemValue;
             break;
           case '4-parity':
             this.parityFile4 = configItemValue;
@@ -270,23 +270,11 @@ export class ConfigFileHelper {
           case 'block_size': {
             const parsed = Number.parseInt(configItemValue, 10);
             this.blockSizeKB = Number.isNaN(parsed) ? this.blockSizeKB : parsed;
-            if (
-              this.blockSizeKB < MIN_BLOCK_SIZE ||
-              this.blockSizeKB > MAX_BLOCK_SIZE
-            ) {
-              isConfigRead = false;
-            }
             break;
           }
           case 'autosave': {
             const parsed = Number.parseInt(configItemValue, 10);
             this.autoSaveGB = Number.isNaN(parsed) ? this.autoSaveGB : parsed;
-            if (
-              this.autoSaveGB < MIN_AUTO_SAVE ||
-              this.autoSaveGB > MAX_AUTO_SAVE
-            ) {
-              isConfigRead = false;
-            }
             break;
           }
           case 'nohidden':
@@ -314,11 +302,31 @@ export class ConfigFileHelper {
             break;
         }
       }
-
-      return isConfigRead;
-    } catch {
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Unknown read error';
+      this.configErrors.push(
+        `Failed to read SnapRAID config file ${configPath}: ${message}`
+      );
       return false;
     }
+
+    return this.validate().length === 0;
+  }
+
+  public validate(): string[] {
+    this.configErrors.length = 0;
+    this.configWarnings.length = 0;
+
+    try {
+      this.doValidation();
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Unknown validation error';
+      this.configErrors.push(`Failed to validate SnapRAID config: ${message}`);
+    }
+
+    return this.configErrors;
   }
 
   public getPathsOfInterest(): CoveragePath[] {
@@ -334,7 +342,6 @@ export class ConfigFileHelper {
 
     this.addParityCoverage(pathsOfInterest, this.parityFile1, 'Parity1');
     this.addParityCoverage(pathsOfInterest, this.parityFile2, 'Parity2');
-    this.addParityCoverage(pathsOfInterest, this.zParityFile, 'ZParity');
     this.addParityCoverage(pathsOfInterest, this.parityFile3, 'Parity3');
     this.addParityCoverage(pathsOfInterest, this.parityFile4, 'Parity4');
     this.addParityCoverage(pathsOfInterest, this.parityFile5, 'Parity5');
@@ -354,7 +361,6 @@ export class ConfigFileHelper {
 
       lines.push(ADDITIONAL_PARITY_SECTION);
       this.addParityToConfig(lines, this.parityFile2, '2');
-      this.addParityToConfig(lines, this.zParityFile, 'z');
       this.addParityToConfig(lines, this.parityFile3, '3');
       this.addParityToConfig(lines, this.parityFile4, '4');
       this.addParityToConfig(lines, this.parityFile5, '5');
@@ -484,12 +490,11 @@ export class ConfigFileHelper {
     return [
       this.parityFile1,
       this.parityFile2,
-      this.zParityFile,
       this.parityFile3,
       this.parityFile4,
       this.parityFile5,
       this.parityFile6,
-    ].filter((entry) => entry.length > 0);
+    ].filter((entry): entry is string => Boolean(entry && entry.length > 0));
   }
 
   private get parityContentPaths(): string[] {
@@ -497,7 +502,7 @@ export class ConfigFileHelper {
   }
 
   private doValidation(): void {
-    if (!this.configPath) {
+    if (!getConfigFile().snapRaidConfigPath) {
       this.configErrors.push(
         'Config validation failed. There is no config file set.'
       );
@@ -551,15 +556,18 @@ export class ConfigFileHelper {
       );
     }
 
-    if (this.blockSizeKB < 1 || this.blockSizeKB > MAX_BLOCK_SIZE) {
+    if (
+      this.blockSizeKB < MIN_BLOCK_SIZE ||
+      this.blockSizeKB > MAX_BLOCK_SIZE
+    ) {
       this.configErrors.push(
-        'The blockSize value is invalid and must be between 1 and 16384'
+        `block_size must be between ${MIN_BLOCK_SIZE} and ${MAX_BLOCK_SIZE}.`
       );
     }
 
-    if (this.autoSaveGB > MAX_AUTO_SAVE) {
+    if (this.autoSaveGB < MIN_AUTO_SAVE || this.autoSaveGB > MAX_AUTO_SAVE) {
       this.configErrors.push(
-        `The autoSave value is invalid and must be between ${MIN_AUTO_SAVE} and ${MAX_AUTO_SAVE}`
+        `autosave must be between ${MIN_AUTO_SAVE} and ${MAX_AUTO_SAVE}.`
       );
     }
   }
@@ -594,10 +602,10 @@ export class ConfigFileHelper {
 
   private addParityCoverage(
     pathsOfInterest: CoveragePath[],
-    parityPaths: string,
+    parityPaths: string | undefined,
     parityName: string
   ): void {
-    if (!parityPaths.trim()) {
+    if (!parityPaths?.trim()) {
       return;
     }
 
@@ -618,10 +626,10 @@ export class ConfigFileHelper {
 
   private addParityToConfig(
     lines: string[],
-    parityPaths: string,
+    parityPaths: string | undefined,
     offset: string | null = null
   ): void {
-    if (!parityPaths) {
+    if (!parityPaths?.trim()) {
       return;
     }
 
