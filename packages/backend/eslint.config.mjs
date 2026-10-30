@@ -8,6 +8,9 @@ export default defineConfig(
   eslint.configs.recommended,
   tseslint.configs.recommended,
   {
+    ignores: ['scripts/**', 'dist/**', 'build/**', 'coverage/**', 'out/**'],
+  },
+  {
     languageOptions: {
       parserOptions: {
         tsconfigRootDir: import.meta.dirname,

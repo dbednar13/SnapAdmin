@@ -28,13 +28,8 @@ jobs:
       - name: Code Setup
         uses: ./.github/actions/code-setup
 
-      - name: Prettier check - backend
-        working-directory: packages/backend
-        run: pnpm exec prettier --check .
-
-      - name: Prettier check - webapp
-        working-directory: packages/webapp
-        run: pnpm exec prettier --check .
+      - name: Prettier check
+        run: pnpm prettier:check
 
   Spellcheck:
     name: Spellcheck
@@ -65,13 +60,8 @@ jobs:
       - name: Code Setup
         uses: ./.github/actions/code-setup
 
-      - name: ESLint check - backend
-        working-directory: packages/backend
-        run: pnpm exec eslint .
-
-      - name: ESLint check - webapp
-        working-directory: packages/webapp
-        run: pnpm exec eslint .
+      - name: ESLint check
+        run: pnpm eslint:check
 
   Test-Check:
     name: Test Check
@@ -89,8 +79,7 @@ jobs:
         working-directory: packages/backend
         run: pnpm test:typecheck
 
-      - name: Run backend tests
-        working-directory: packages/backend
+      - name: Run unit tests
         run: pnpm test
 
   Build:

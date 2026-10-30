@@ -72,10 +72,13 @@ jobs:
           cp -a release/package/node_modules release/package/dist/
           cd release/package/dist
           zip -r "../../SnapAdmin_${VERSION}.zip" .
+          zip -r "../../SnapAdmin_${VERSION}_no-config.zip" . -x "config.yaml"
 
       - name: Publish GitHub release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.version.outputs.tag }}
-          files: release/SnapAdmin_${{ steps.version.outputs.version }}.zip
+          files: |
+            release/SnapAdmin_${{ steps.version.outputs.version }}.zip
+            release/SnapAdmin_${{ steps.version.outputs.version }}_no-config.zip
           generate_release_notes: true

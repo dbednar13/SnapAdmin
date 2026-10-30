@@ -38,7 +38,7 @@ const ALLOWED_COMMAND_OPTIONS = new Set(
   DEFINITION_BASED_ARGUMENTS.flatMap(({ short, long }) => [
     ...(short ? [`-${short}`] : []),
     ...(long ? [`--${long}`] : []),
-  ]),
+  ])
 );
 
 export const test = 'abc';
@@ -84,7 +84,7 @@ const getOptionValueFlag = (optionToken: string) => {
     const shortName = shortOptionMatch[1];
     const hasValue = DEFINITION_BASED_ARGUMENTS.some(
       ({ short, long }) =>
-        short === shortName && long && ARGUMENTS_WITH_VALUES.has(long),
+        short === shortName && long && ARGUMENTS_WITH_VALUES.has(long)
     );
 
     return hasValue ? shortName : null;
@@ -99,7 +99,7 @@ const isAllowedOptionToken = (token: string) => {
 };
 
 const extractOptionEntries = (
-  tokens: string[],
+  tokens: string[]
 ): Array<{ key: string; tokens: string[] }> => {
   const entries: Array<{ key: string; tokens: string[] }> = [];
 
@@ -208,7 +208,7 @@ export const sanitizeAdditionalArguments = (value: string): string => {
 
 export const mergeCommandAndAdditionalArgs = (
   command: string,
-  additionalArgs: string,
+  additionalArgs: string
 ): string => {
   const sanitizedCommand = sanitizeCommandInput(command);
   const sanitizedAdditionalArgs = sanitizeAdditionalArguments(additionalArgs);
