@@ -1,75 +1,83 @@
 # SnapAdmin
 
-Web based UI for SnapRaid. Inspired and influenced heavily by [Elucidate](https://github.com/Smurf-IV/Elucidate). If you wish for an application to manage your SnapRaid installation, I recommend checking it out.
+Web based UI for SnapRaid. Inspired by [Elucidate](https://github.com/Smurf-IV/Elucidate). If you wish for a standard Windows application to manage your SnapRaid installation, I recommend checking it out.
 
-## Project Structure
+## Installing
 
-This is a PNPM monorepo containing two packages:
+- [Install SnapRaid](https://www.snapraid.it/download) if not already installed
+- If necessary, install the [latest version of Node ](https://nodejs.org/en/download)
+- Download the latest release [from Github](https://github.com/dbednar13/SnapAdmin/releases)
+- Extract the zip to the location of your choice.
 
-- **backend** - TypeScript Express web server (port 9153)
-- **webapp** - Vite + React + TypeScript frontend (port 5173)
+## System Setup
 
-## Prerequisites
+To set up the application to run as a service, follow these steps:
 
-- Node.js 18+
-- PNPM 8+
+### Linux
 
-## Installation
+- Create the service file
 
-Install all dependencies from the root:
+  ```bash
+  sudo nano /etc/systemd/system/snapAdmin.service
+  ```
 
-```bash
-pnpm install
-```
+- Paste the following replacing /opt/snapAdmin with the location where you extracted the zip.
 
-## Development
+  ```ini
+  [Unit]
+  Description=SnapAdmin Service
+  After=network.target
 
-Run both packages in development mode:
+  [Service]
+  Type=simple
+  User=root
+  WorkingDirectory=/opt/snapAdmin
+  ExecStart=/usr/bin/node /opt/snapAdmin/index.js
+  Restart=on-failure
+  RestartSec=5
 
-```bash
-pnpm dev
-```
+  [Install]
+  WantedBy=multi-user.target
+  ```
 
-Or run them individually:
+- Enable and run the service
 
-```bash
-# Backend only
-pnpm backend:dev
+  ```bash
+  sudo systemctl daemon-reload
+  sudo systemctl enable snapAdmin.service
+  sudo systemctl start snapAdmin.service
+  ```
 
-# Webapp only
-pnpm webapp:dev
-```
+### Windows
 
-## Building
+- If necessary, install the [Non-Sucking Service Manager (NSSM)](https://nssm.cc/download)
+- Open command prompt and execute the following commands:
+  1. Install the service with the path to your node executable
 
-Build all packages:
+  ```cmd
+  nssm install "SnapAdmin" "C:\Program Files\nodejs\node.exe"
+  ```
 
-```bash
-pnpm build
-```
+  2. Set the root directory of your Node.js application
 
-Or build individually:
+  ```cmd
+  nssm set "SnapAdmin" AppDirectory "C:\path\to\your\app"
+  ```
 
-```bash
-# Backend only
-pnpm backend:build
+  3. Set your starting script as the argument
 
-# Webapp only
-pnpm webapp:build
-```
+  ```cmd
+  nssm set "SnapAdmin" AppParameters "index.js"
+  ```
 
-## Package Details
+  4. Start the service
 
-### Backend (`packages/backend`)
+  ```cmd
+  nssm start "SnapAdmin"
+  ```
 
-- Express server with TypeScript
-- Runs on http://localhost:9153
-- API endpoints:
-  - `GET /` - Welcome message
-  - `GET /api/health` - Health check
+## Initial Setup
 
-### Webapp (`packages/webapp`)
+Once the service is running, open `http://localhost:9153/` in your browser. To change the default port, open the Settings tab or navigate to `/admin-config`.
 
-- Vite + React + TypeScript
-- Runs on http://localhost:5173
-- Hot module replacement enabled
+In the Settings page, provide the path to your `snapRAID.conf` file. If you have not used SnapRAID before or have not modified its configuration, you can find the default config next to the SnapRAID executable on your system.
