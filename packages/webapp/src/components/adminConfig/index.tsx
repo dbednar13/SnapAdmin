@@ -160,9 +160,6 @@ export default function AdminConfig() {
               onChange={(event) => setSnapRaidConfigPath(event.target.value)}
               className="w-full rounded border border-gray-300 bg-white px-3 py-2 text-center text-sm dark:border-neutral-600 dark:bg-neutral-800"
             />
-            <p className="mt-1 text-xs text-gray-600 dark:text-neutral-400">
-              If left blank, the config file next to the executable is used.
-            </p>
           </div>
 
           <div className="flex items-center justify-center gap-3">

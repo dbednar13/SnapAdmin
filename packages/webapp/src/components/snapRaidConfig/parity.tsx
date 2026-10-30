@@ -12,11 +12,11 @@ type ParityField =
 
 const parityFields: { name: ParityField; label: string }[] = [
   { name: 'parityFile1', label: 'Parity file' },
-  { name: 'parityFile2', label: '2-parity file' },
-  { name: 'parityFile3', label: '3-parity file' },
-  { name: 'parityFile4', label: '4-parity file' },
-  { name: 'parityFile5', label: '5-parity file' },
-  { name: 'parityFile6', label: '6-parity file' },
+  { name: 'parityFile2', label: 'Parity 2 file' },
+  { name: 'parityFile3', label: 'Parity 3 file' },
+  { name: 'parityFile4', label: 'Parity 4 file' },
+  { name: 'parityFile5', label: 'Parity 5 file' },
+  { name: 'parityFile6', label: 'Parity 6 file' },
 ];
 
 interface ParityProps {

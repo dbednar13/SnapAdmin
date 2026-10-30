@@ -1,5 +1,5 @@
 import type { SnapRaidConfig, SnapRaidConfigWithValidation } from 'common';
-import { type SubmitEvent, useEffect, useState } from 'react';
+import { type SubmitEvent, useEffect, useRef, useState } from 'react';
 import { Link, useBeforeUnload, useBlocker, useNavigate } from 'react-router';
 
 import Content from './content';
@@ -26,6 +26,33 @@ const toEditableConfig = (
   nohidden: result.nohidden,
 });
 
+const getFormValidationErrors = (config: SnapRaidConfig): string[] => {
+  const errors: string[] = [];
+
+  config.contentFiles.forEach((file, index) => {
+    if (!file.trim()) {
+      errors.push(`Content file ${index + 1} must not be empty.`);
+    }
+  });
+  config.snapShotSources.forEach((source, index) => {
+    if (!source.dirSource.trim()) {
+      errors.push(`Data source ${index + 1} directory must not be empty.`);
+    }
+  });
+  config.excludePatterns.forEach((pattern, index) => {
+    if (!pattern.trim()) {
+      errors.push(`Exclude pattern ${index + 1} must not be empty.`);
+    }
+  });
+  config.includePatterns.forEach((pattern, index) => {
+    if (!pattern.trim()) {
+      errors.push(`Include pattern ${index + 1} must not be empty.`);
+    }
+  });
+
+  return errors;
+};
+
 export default function SnapRaidConfigPage() {
   const navigate = useNavigate();
   const [config, setConfig] = useState<SnapRaidConfig | null>(null);
@@ -39,11 +66,13 @@ export default function SnapRaidConfigPage() {
   const [saving, setSaving] = useState(false);
   const [missingConfigPath, setMissingConfigPath] = useState(false);
   const [navigateAfterSave, setNavigateAfterSave] = useState(false);
+  const skipNavigationBlock = useRef(false);
   const isDirty =
     config !== null &&
     initialConfig !== null &&
     JSON.stringify(config) !== JSON.stringify(initialConfig);
-  const blocker = useBlocker(isDirty);
+  const formValidationErrors = config ? getFormValidationErrors(config) : [];
+  const blocker = useBlocker(() => isDirty && !skipNavigationBlock.current);
 
   useBeforeUnload((event) => {
     if (isDirty) {
@@ -113,9 +142,17 @@ export default function SnapRaidConfigPage() {
     setConfig((current) => (current ? { ...current, [key]: value } : current));
   };
 
+  const handleCancel = () => {
+    if (initialConfig) {
+      setConfig(initialConfig);
+    }
+    skipNavigationBlock.current = true;
+    navigate('/', { replace: true });
+  };
+
   const handleSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!config) {
+    if (!config || formValidationErrors.length > 0) {
       return;
     }
 
@@ -229,6 +266,22 @@ export default function SnapRaidConfigPage() {
             </div>
           )}
 
+          {formValidationErrors.length > 0 && (
+            <div
+              role="alert"
+              className="mb-4 border-l-4 border-red-600 bg-red-50 px-4 py-3 text-sm text-red-950 dark:bg-red-950/40 dark:text-red-100"
+            >
+              <p className="font-semibold">
+                Complete or remove empty entries before saving.
+              </p>
+              <ul className="mt-2 list-disc space-y-1 pl-5">
+                {formValidationErrors.map((error) => (
+                  <li key={error}>{error}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           {!missingConfigPath && config && (
             <form onSubmit={handleSubmit} className="space-y-6">
               <Parity config={config} updateConfig={updateConfig} />
@@ -238,14 +291,25 @@ export default function SnapRaidConfigPage() {
                 <DataSources config={config} updateConfig={updateConfig} />
               </div>
 
-              <Patterns config={config} updateConfig={updateConfig} />
+              <div className="border-t border-gray-200 pt-6 dark:border-neutral-700">
+                <Patterns config={config} updateConfig={updateConfig} />
+              </div>
 
               <GeneralSettings config={config} updateConfig={updateConfig} />
 
-              <div className="flex justify-end border-t border-gray-200 pt-5 dark:border-neutral-700">
+              <div className="flex justify-end gap-2 border-t border-gray-200 pt-5 dark:border-neutral-700">
+                <button
+                  type="button"
+                  onClick={handleCancel}
+                  className="rounded border border-gray-300 px-4 py-2 text-sm font-medium hover:bg-gray-100 dark:border-neutral-600 dark:hover:bg-neutral-800"
+                >
+                  Cancel
+                </button>
                 <button
                   type="submit"
-                  disabled={saving || !isDirty}
+                  disabled={
+                    saving || !isDirty || formValidationErrors.length > 0
+                  }
                   className="rounded bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {saving ? 'Saving...' : 'Save configuration'}

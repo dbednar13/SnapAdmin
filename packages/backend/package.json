@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "tsc && tsc-alias -p tsconfig.json && node -e \"const fs=require('fs'); const path=require('path'); const src=path.resolve('config.yaml'); const dest=path.resolve('dist/config.yaml'); fs.copyFileSync(src, dest);\"",
+    "build": "tsc && tsc-alias -p tsconfig.json && node -e \"const fs=require('fs'); const path=require('path'); const YAML=require('yaml'); const src=path.resolve('config.yaml'); const dest=path.resolve('dist/config.yaml'); const config=YAML.parse(fs.readFileSync(src, 'utf8')); config.snapRaidConfigPath=''; fs.writeFileSync(dest, YAML.stringify(config));\"",
     "test": "tsx --test test/configFileHelper.test.ts",
     "test:typecheck": "tsc --noEmit -p test/tsconfig.json",
     "start": "node dist/index.js",

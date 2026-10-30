@@ -8,8 +8,12 @@ export function RoutedApp() {
         <header className="sticky top-0 z-20 bg-white/90 dark:bg-neutral-900/90 backdrop-blur-md border-b border-gray-200 dark:border-neutral-700">
           <div className="px-4 py-4 flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="h-10 w-10 bg-indigo-500 rounded-md flex items-center justify-center text-white font-bold">
-                S
+              <div className="h-10 w-10 rounded-md overflow-hidden flex items-center justify-center">
+                <img
+                  src="/SnapAdmin.svg"
+                  alt="SnapAdmin logo"
+                  className="h-full w-full object-cover"
+                />
               </div>
               <div>
                 <div className="font-semibold">SnapAdmin</div>
