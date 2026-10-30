@@ -81,3 +81,7 @@ To set up the application to run as a service, follow these steps:
 Once the service is running, open `http://localhost:9153/` in your browser. To change the default port, open the Settings tab or navigate to `/admin-config`.
 
 In the Settings page, provide the path to your `snapRAID.conf` file. If you have not used SnapRAID before or have not modified its configuration, you can find the default config next to the SnapRAID executable on your system.
+
+## Updates
+
+In addition to the standard release, we include a "no-config" zip. This zip is intended to use to update existing installations. It is identical to the standard zip but does not include the config.yaml file that holds the server configuration. This allows you to overwrite all existing files without needing to worry about losing your server configuration.
