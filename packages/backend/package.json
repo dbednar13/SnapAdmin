@@ -9,6 +9,8 @@
     "test": "tsx --test test/configFileHelper.test.ts",
     "test:typecheck": "pnpm --filter common build && tsc --noEmit -p test/tsconfig.json",
     "start": "node dist/index.js",
+    "prettier:check": "prettier --check .",
+    "eslint:check": "eslint .",
     "format": "prettier --write .",
     "lint": "eslint ."
   },
