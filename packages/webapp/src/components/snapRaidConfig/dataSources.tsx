@@ -2,6 +2,23 @@ import type { SnapRaidConfig } from 'common';
 
 import type { ConfigUpdater } from './types';
 
+const getContentFilePath = (directory: string): string | undefined => {
+  const trimmedDirectory = directory.trim();
+  const isWindowsPath = /^[A-Za-z]:[\\/]/.test(trimmedDirectory);
+  if (!isWindowsPath && !trimmedDirectory.startsWith('/')) {
+    return undefined;
+  }
+
+  const separator = isWindowsPath
+    ? trimmedDirectory.includes('\\')
+      ? '\\'
+      : '/'
+    : '/';
+  const normalizedDirectory = trimmedDirectory.replace(/[\\/]+$/, '');
+
+  return `${normalizedDirectory}${separator}snapraid.content`;
+};
+
 interface DataSourcesProps {
   config: SnapRaidConfig;
   updateConfig: ConfigUpdater;
@@ -48,8 +65,23 @@ export default function DataSources({
               value={source.dirSource}
               onChange={(event) => {
                 const sources = [...config.snapShotSources];
-                sources[index] = { ...source, dirSource: event.target.value };
+                const dirSource = event.target.value;
+                sources[index] = { ...source, dirSource };
                 updateConfig('snapShotSources', sources);
+              }}
+              onBlur={(event) => {
+                const contentFilePath = getContentFilePath(
+                  event.currentTarget.value
+                );
+                if (
+                  contentFilePath &&
+                  !config.contentFiles.includes(contentFilePath)
+                ) {
+                  updateConfig('contentFiles', [
+                    ...config.contentFiles,
+                    contentFilePath,
+                  ]);
+                }
               }}
               className="min-w-0 rounded border border-gray-300 bg-white px-2 py-2 text-sm dark:border-neutral-600 dark:bg-neutral-800"
             />
