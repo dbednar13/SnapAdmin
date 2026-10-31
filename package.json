@@ -1,0 +1,31 @@
+{
+  "name": "snapadmin",
+  "version": "0.2.12",
+  "description": "Web based UI for SnapRaid",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --parallel --stream -r dev",
+    "build": "pnpm -r build",
+    "prettier:check": "pnpm -r --if-present prettier:check",
+    "eslint:check": "pnpm -r --if-present eslint:check",
+    "test": "pnpm -r --if-present test",
+    "package:release": "node scripts/package-release.mjs",
+    "backend:dev": "pnpm --filter backend dev",
+    "webapp:dev": "pnpm --filter webapp dev",
+    "backend:build": "pnpm --filter backend build",
+    "webapp:build": "pnpm --filter webapp build"
+  },
+  "keywords": [
+    "snapraid",
+    "monorepo",
+    "pnpm"
+  ],
+  "author": "",
+  "license": "GPL-3.0",
+  "packageManager": "pnpm@12.3.4+sha512.961aa41fb077da3a04a441d9f8e15ebc0c96da8ef710b2eb67bf9ee7cb0610eabd48f1fd85f51cffe73846785fa0f87c56a3a872a1d893f8446741b5cce45457",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.72.0",
+    "@typescript-eslint/parser": "^8.72.0",
+    "cspell": "^10.4.0"
+  }
+}

@@ -1,0 +1,30 @@
+name: 'Code Setup'
+description: 'Re-usable action to checkout code'
+
+inputs:
+  skip-install:
+    description: 'Skip installing dependencies.  Useful for when you just need to checkout code'
+    required: false
+    default: false
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Enable Corepack
+      run: corepack enable
+      shell: bash
+
+    - name: Setup Node.js (with pnpm cache)
+      if: ${{ inputs.skip-install != 'true' }}
+      uses: actions/setup-node@v6
+      with:
+        cache: 'pnpm'
+
+    - name: Setup Node.js (without pnpm cache)
+      if: ${{ inputs.skip-install == 'true' }}
+      uses: actions/setup-node@v6
+
+    - name: Install dependencies
+      if: ${{ inputs.skip-install != 'true' }}
+      run: pnpm install --frozen-lockfile
+      shell: bash

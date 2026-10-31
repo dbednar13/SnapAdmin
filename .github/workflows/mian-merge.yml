@@ -1,0 +1,84 @@
+name: Main Merge
+description: Run version bump & deploy on main branch merges.
+
+on:
+  pull_request:
+    branches: [main]
+    types: [closed] # Fires when a PR is closed, regardless of whether it merged
+
+permissions:
+  contents: write
+
+jobs:
+  Version-Bump:
+    name: Version Bump
+    runs-on: ubuntu-latest
+    if: ${{ github.event.pull_request.merged == true }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          # Explicitly pull the source branch of the PR
+          # ref: ${{ github.head_ref }}
+          ref: main
+          # Fetches all history, necessary if your scripts look at Git history
+          fetch-depth: 0
+          token: ${{ secrets.VERSION_TOKEN }}
+
+      - name: Code Setup
+        uses: ./.github/actions/code-setup
+
+      - name: PNPM Version Bump
+        uses: ./.github/actions/version-bump
+
+  Build-and-Release:
+    name: Build & Publish Release
+    needs: Version-Bump
+    runs-on: ubuntu-latest
+    if: ${{ github.event.pull_request.merged == true }}
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v7
+        with:
+          ref: main
+          fetch-depth: 0
+          token: ${{ secrets.VERSION_TOKEN }}
+
+      - name: Code Setup
+        uses: ./.github/actions/code-setup
+
+      - name: Read version
+        id: version
+        shell: bash
+        run: |
+          VERSION="$(node -p "require('./package.json').version")"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "tag=v${VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Build project
+        shell: bash
+        run: pnpm build
+
+      - name: Create backend dist zip
+        shell: bash
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          mkdir -p release
+          pnpm --filter backend deploy --prod release/package
+          rm -rf release/package/node_modules
+          pnpm --dir release/package install --prod --frozen-lockfile --node-linker=hoisted
+          cp -a release/package/node_modules release/package/dist/
+          cd release/package/dist
+          zip -r "../../SnapAdmin_${VERSION}.zip" .
+          zip -r "../../SnapAdmin_${VERSION}_no-config.zip" . -x "config.yaml"
+
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          files: |
+            release/SnapAdmin_${{ steps.version.outputs.version }}.zip
+            release/SnapAdmin_${{ steps.version.outputs.version }}_no-config.zip
+          generate_release_notes: true

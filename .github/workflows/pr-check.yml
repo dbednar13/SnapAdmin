@@ -1,0 +1,98 @@
+name: PR Checks
+description: Run linting, prettier checks, tests, and build on pull requests.
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  Check-Out:
+    name: Checkout & Validate Setup
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Code Setup
+        uses: ./.github/actions/code-setup
+
+  Prettier-Check:
+    name: Prettier Check
+    runs-on: ubuntu-latest
+    needs: Check-Out
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Code Setup
+        uses: ./.github/actions/code-setup
+
+      - name: Prettier check
+        run: pnpm prettier:check
+
+  Spellcheck:
+    name: Spellcheck
+    runs-on: ubuntu-latest
+    needs: Check-Out
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Code Setup
+        uses: ./.github/actions/code-setup
+
+      - name: CSpell check
+        uses: streetsidesoftware/cspell-action@v8
+        with:
+          config: .cspell.json
+
+  Lint-Check:
+    name: Lint Check
+    runs-on: ubuntu-latest
+    needs: Check-Out
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Code Setup
+        uses: ./.github/actions/code-setup
+
+      - name: ESLint check
+        run: pnpm eslint:check
+
+  Test-Check:
+    name: Test Check
+    runs-on: ubuntu-latest
+    needs: Check-Out
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Code Setup
+        uses: ./.github/actions/code-setup
+
+      - name: Typecheck backend tests
+        working-directory: packages/backend
+        run: pnpm test:typecheck
+
+      - name: Run unit tests
+        run: pnpm test
+
+  Build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: [Prettier-Check, Spellcheck, Lint-Check, Test-Check]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Code Setup
+        uses: ./.github/actions/code-setup
+
+      - name: Build packages
+        run: pnpm run build

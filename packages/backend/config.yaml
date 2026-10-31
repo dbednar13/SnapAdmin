@@ -1,0 +1,3 @@
+#SnapAdmin Configuration
+port: 9153
+snapRaidConfigPath: test/fixtures/SnapRAID.conf
