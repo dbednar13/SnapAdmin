@@ -6,6 +6,13 @@ import { Request, Response } from 'express';
 
 import { getConfigFile } from '../config/serverConfig';
 
+const getTimestamp = () => {
+  const now = new Date();
+  return [now.getHours(), now.getMinutes(), now.getSeconds()]
+    .map((part) => String(part).padStart(2, '0'))
+    .join(':');
+};
+
 export function executeCommand(
   state: {
     child: ChildProcessWithoutNullStreams | undefined;
@@ -68,13 +75,13 @@ export function executeCommand(
   }
 
   state.child.stdout.on('data', (data) => {
-    const text = data.toString();
+    const text = `${getTimestamp()} ${data.toString()}`;
     buffer.forward(text);
     broadcast('message', text);
   });
 
   state.child.stderr.on('data', (data) => {
-    const text = data.toString();
+    const text = `${getTimestamp()} ${data.toString()}`;
     buffer.forward(text);
     broadcast('message', text);
   });

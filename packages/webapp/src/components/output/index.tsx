@@ -4,6 +4,11 @@ type OutputAreaProps = {
   commandMessage: string;
 };
 
+const appendOutputLine = (current: string, message: string) =>
+  current && !current.endsWith('\n')
+    ? `${current}\n${message}`
+    : `${current}${message}`;
+
 const OutputArea = ({ commandMessage }: OutputAreaProps) => {
   const [output, setOutput] = useState('');
   const [status, setStatus] = useState('Connecting...');
@@ -25,19 +30,17 @@ const OutputArea = ({ commandMessage }: OutputAreaProps) => {
     };
 
     source.onmessage = (event) => {
-      setOutput((current) =>
-        current ? `${current}${event.data}` : event.data
-      );
+      setOutput((current) => appendOutputLine(current, event.data));
     };
 
     source.addEventListener('initial', (event) => {
       const message = (event as MessageEvent).data;
-      setOutput((current) => (current ? `${current}${message}` : message));
+      setOutput((current) => appendOutputLine(current, message));
     });
 
     source.addEventListener('output', (event) => {
       const message = (event as MessageEvent).data;
-      setOutput((current) => (current ? `${current}${message}` : message));
+      setOutput((current) => appendOutputLine(current, message));
     });
 
     source.onerror = () => {
