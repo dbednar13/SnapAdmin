@@ -76,6 +76,36 @@ To set up the application to run as a service, follow these steps:
   nssm start "SnapAdmin"
   ```
 
+### Nginx
+
+SnapAdmin uses SSE streaming to communicate between the UI and the backend. This requires some extra settings to an Nginx Reverse Proxy to initiate and keep our connections alive.
+
+```
+server {
+	listen 443 ssl;
+	listen [::]:443 ssl;
+
+	server_name your.service.tld;
+
+	location / {
+		# Proxy main SnapAdmin traffic
+		proxy_pass http://127.0.0.1:9153;
+		proxy_set_header Host $host;
+		proxy_set_header X-Real-IP $remote_addr;
+		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+		proxy_set_header X-Forwarded-Proto $scheme;
+		proxy_set_header X-Forwarded-Protocol $scheme;
+		proxy_set_header X-Forwarded-Host $http_host;
+
+		# Essential for streaming / long-polling connections
+		proxy_buffering off;
+		proxy_http_version 1.1;
+		proxy_set_header Upgrade $http_upgrade;
+		proxy_set_header Connection "upgrade";
+	}
+}
+```
+
 ## Initial Setup
 
 Once the service is running, open `http://localhost:9153/` in your browser. To change the default port, open the Settings tab or navigate to `/admin-config`.
