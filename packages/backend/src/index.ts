@@ -54,10 +54,15 @@ app.use(express.json());
 // Connection endpoint to subscribe to console output
 app.get('/api/connect', (req: Request, res: Response) => {
   res.setHeader('Content-Type', 'text/event-stream');
-  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Cache-Control', 'no-cache, no-transform');
   res.setHeader('Connection', 'keep-alive');
+  res.setHeader('X-Accel-Buffering', 'no');
   res.flushHeaders?.();
   res.write(': connected\n\n');
+
+  const keepAlive = setInterval(() => {
+    res.write(': keep-alive\n\n');
+  }, 15000);
 
   if (buffer.current()) {
     sendSSE(res, 'initial', buffer.current());
@@ -66,6 +71,7 @@ app.get('/api/connect', (req: Request, res: Response) => {
   state.clients.push(res);
 
   req.on('close', () => {
+    clearInterval(keepAlive);
     state.clients = state.clients.filter((client) => client !== res);
   });
 });
