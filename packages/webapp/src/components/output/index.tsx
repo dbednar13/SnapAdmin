@@ -44,8 +44,7 @@ const OutputArea = ({ commandMessage }: OutputAreaProps) => {
     });
 
     source.onerror = () => {
-      setStatus('Connection Error');
-      source.close();
+      setStatus('Reconnecting...');
     };
 
     return () => {
