@@ -4,21 +4,49 @@ type OutputAreaProps = {
   commandMessage: string;
 };
 
+type OutputTone = 'warning' | 'error' | 'normal';
+
 const appendOutputLine = (current: string, message: string) =>
   current && !current.endsWith('\n')
     ? `${current}\n${message}`
     : `${current}${message}`;
 
+const getOutputTone = (line: string): OutputTone => {
+  const withoutTimestamp = line
+    .replace(
+      /^\[?(?:\d{4}-\d{2}-\d{2}[T\s])?\d{1,2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:?\d{2})?\]?\s*/,
+      ''
+    )
+    .replace(/^\[?\d{1,2}:\d{2}:\d{2}\]?\s*/, '')
+    .trimStart();
+
+  if (
+    withoutTimestamp.startsWith('WARNING!') ||
+    withoutTimestamp.startsWith('WARN')
+  ) {
+    return 'warning';
+  }
+
+  if (
+    withoutTimestamp.startsWith('ERROR!') ||
+    withoutTimestamp.startsWith('ERROR')
+  ) {
+    return 'error';
+  }
+
+  return 'normal';
+};
+
 const OutputArea = ({ commandMessage }: OutputAreaProps) => {
   const [output, setOutput] = useState('');
   const [status, setStatus] = useState('Connecting...');
 
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const outputRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to the bottom whenever text updates
   useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.scrollTop = textareaRef.current.scrollHeight;
+    if (outputRef.current) {
+      outputRef.current.scrollTop = outputRef.current.scrollHeight;
     }
   }, [output]);
 
@@ -60,12 +88,31 @@ const OutputArea = ({ commandMessage }: OutputAreaProps) => {
           <div>{commandMessage}</div>
         </div>
 
-        <textarea
-          readOnly
-          value={output}
-          ref={textareaRef}
-          className="min-h-56 w-full resize-none rounded-md border border-gray-300 bg-gray-50 p-3 text-sm font-mono text-slate-900 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
-        />
+        <div
+          ref={outputRef}
+          role="log"
+          aria-live="polite"
+          className="h-56 w-full overflow-y-auto rounded-md border border-gray-300 bg-gray-50 p-3 text-left text-sm font-mono text-slate-900 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
+        >
+          {output.split('\n').map((line, index) => {
+            const tone = getOutputTone(line);
+            const toneClass =
+              tone === 'warning'
+                ? 'text-amber-700 dark:text-amber-300'
+                : tone === 'error'
+                  ? 'text-red-700 dark:text-red-300'
+                  : '';
+
+            return (
+              <div
+                key={`${index}-${line}`}
+                className={`min-h-5 text-left whitespace-pre-wrap wrap-break-word ${toneClass}`}
+              >
+                {line || '\u00a0'}
+              </div>
+            );
+          })}
+        </div>
       </div>
     </section>
   );
