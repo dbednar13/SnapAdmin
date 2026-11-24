@@ -74,28 +74,63 @@ export function executeCommand(
     });
   }
 
+  const createLineEmitter = () => {
+    let pending = '';
+
+    const emitLine = (line: string) => {
+      if (!line) {
+        return;
+      }
+
+      const text = `${getTimestamp()} ${line}`;
+      buffer.forward(text);
+      broadcast('message', text);
+    };
+
+    return {
+      write(data: Buffer) {
+        pending += data.toString();
+        const lines = pending.split(/\r?\n/);
+        pending = lines.pop() ?? '';
+
+        lines.forEach((line) => emitLine(line));
+      },
+      flush() {
+        emitLine(pending);
+        pending = '';
+      },
+    };
+  };
+
+  const stdoutEmitter = createLineEmitter();
+  const stderrEmitter = createLineEmitter();
+
   state.child.stdout.on('data', (data) => {
-    const text = `${getTimestamp()} ${data.toString()}`;
-    buffer.forward(text);
-    broadcast('message', text);
+    stdoutEmitter.write(data);
   });
 
   state.child.stderr.on('data', (data) => {
-    const text = `${getTimestamp()} ${data.toString()}`;
+    stderrEmitter.write(data);
+  });
+
+  state.child.on('close', (code) => {
+    stdoutEmitter.flush();
+    stderrEmitter.flush();
+    state.child = undefined;
+    const message = `child process exited with code ${code}`;
+    const text = `${getTimestamp()} ${message}`;
     buffer.forward(text);
     broadcast('message', text);
   });
 
-  state.child.on('close', (code) => {
-    state.child = undefined;
-    const message = `child process exited with code ${code}`;
-    broadcast('message', message);
-  });
-
   state.child.on('error', (error) => {
+    stdoutEmitter.flush();
+    stderrEmitter.flush();
     state.child = undefined;
     const message = `Error spawning snapraid process: ${error.message}`;
-    broadcast('message', message);
+    const text = `${getTimestamp()} ${message}`;
+    buffer.forward(text);
+    broadcast('message', text);
   });
 
   return res.status(200).json({
